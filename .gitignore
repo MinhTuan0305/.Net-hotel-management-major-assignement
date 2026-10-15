@@ -1,0 +1,11 @@
+# Visual Studio
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.bak
+
+# Cấu hình riêng từng máy và log khi chạy
+connectionStrings.config
+Logs/

@@ -1,0 +1,2 @@
+*.csproj merge=union
+*.bat text eol=crlf
