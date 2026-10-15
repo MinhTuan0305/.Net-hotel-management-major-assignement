@@ -19,11 +19,11 @@ Chi tiết từng form nằm trong `docs/KE_HOACH_TRIEN_KHAI.md`; nghiệp vụ 
 | Database: 3 script `database/01..03` | Xong, đã chạy trên SQL Server 2022, file `03` PASS hết (14/10/2026) |
 | Lớp dùng chung `Core/` (9 file) | Xong, Rebuild 0 lỗi 0 cảnh báo (14/10/2026) |
 | `.csproj` đã khai báo Core, BCrypt.Net-Next 4.2.0, System.Configuration, 2 target tạo `connectionStrings.config` | Xong |
-| `Program.cs` | Tạm chạy `Form1` (chưa có frmLogin/frmMain) |
+| `Program.cs` | CODE TẠM: tự đăng nhập `admin` rồi mở `frmFrontDesk` (chưa có frmLogin/frmMain). `Form1` đã xóa |
 | Git | **Thư mục chưa phải repo Git**. Đã có `.gitignore`, `.gitattributes` |
 | `database/reset_db.bat` | Xong (14/10/2026), đã thử nhánh hỏi server/hủy; chưa chạy thật trọn 01→03→02 |
 | `database/CHANGELOG.md` | Xong (15/10/2026). Mỗi lần sửa script DB thì thêm mục mới lên đầu |
-| 23 form | Chưa làm form nào (`Form1` là form mặc định của VS, sẽ bỏ) |
+| 23 form | `frmFrontDesk` xong khung (build sạch, chưa thử F5); các nút mở form chưa có đang báo "đang xây dựng" |
 
 Khi xong một hạng mục, cập nhật bảng này và cột "Trạng thái" ở mục 7.
 
@@ -44,8 +44,7 @@ Hotel_management_system/              <- thư mục gốc = thư mục project (
   docs/      Tai_lieu_nghiep_vu.md (+ .docx gốc), KE_HOACH_TRIEN_KHAI.md
 ```
 
-- RootNamespace của project là `Hotel_management_system`. Form đặt trong `Forms/<Nhóm>/` có namespace `Hotel_management_system.Forms.<Nhóm>`.
-- Core dùng namespace `HotelManagement.Core`. Mọi form phải có `using HotelManagement.Core;`.
+- RootNamespace của project là `Hotel_management_system`. Form đặt trong `Forms/<Nhóm>/` có namespace `Hotel_management_system.Forms.<Nhóm>`.- Core dùng namespace `HotelManagement.Core`. Mọi form phải có `using HotelManagement.Core;`.
 
 ## 4. Build, chạy, database
 
@@ -206,7 +205,7 @@ Thư mục và namespace theo nhóm. "A/M/R/H" = Admin/Manager/Receptionist/Hous
 | 11 | frmBookingEdit | Forms/Booking | C | A,M,R | chưa |
 | 12 | dlgCancel | Forms/Booking | C | A,M,R | chưa |
 | 13 | dlgPayment | Forms/Billing | C | A,M,R (hoàn: A,M) | chưa |
-| 14 | **frmFrontDesk** | Forms/Stay | **Tuấn** | A,M,R | chưa |
+| 14 | **frmFrontDesk** | Forms/Stay | **Tuấn** | A,M,R | khung xong, chờ nối dlgCheckIn... |
 | 15 | **dlgCheckIn** | Forms/Stay | **Tuấn** | A,M,R | chưa |
 | 16 | **frmServiceUsage** | Forms/Stay | **Tuấn** | A,M,R | chưa |
 | 17 | **dlgExtendStay** | Forms/Stay | **Tuấn** | A,M,R | chưa |

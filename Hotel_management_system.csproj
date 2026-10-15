@@ -56,11 +56,11 @@
     <Compile Include="Core\PasswordHasher.cs" />
     <Compile Include="Core\Session.cs" />
     <Compile Include="Core\UiHelper.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="Forms\Stay\frmFrontDesk.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Forms\Stay\frmFrontDesk.Designer.cs">
+      <DependentUpon>frmFrontDesk.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

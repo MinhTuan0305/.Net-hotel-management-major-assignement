@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using HotelManagement.Core;
+using Hotel_management_system.Forms.Stay;
 
 namespace Hotel_management_system
 {
@@ -12,7 +13,7 @@ namespace Hotel_management_system
         //   3. Mở form đầu tiên.
         //
         // Khi đã có frmLogin và frmMain (frmMain có thuộc tính public bool LoggedOut),
-        // thay dòng Application.Run(new Form1()) bằng vòng lặp sau:
+        // thay đoạn CODE TẠM bên dưới bằng vòng lặp sau:
         //
         //   while (true)
         //   {
@@ -38,7 +39,17 @@ namespace Hotel_management_system
                 return;
             }
 
-            Application.Run(new Form1());
+            // ===== CODE TẠM (Tuấn) – XÓA khi đã có frmLogin và frmMain =====
+            // Tự đăng nhập bằng tài khoản admin mẫu rồi mở thẳng màn hình lễ tân để thử.
+            // Đăng nhập thật qua DB (sp_GetEmployeeForLogin) nên Session.EmployeeParam() dùng được.
+            string loginError;
+            if (!Session.TryLogin("admin", "Admin@123", out loginError))
+            {
+                MessageBox.Show(loginError, UiHelper.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            Application.Run(new frmFrontDesk());
+            // ===== HẾT CODE TẠM =====
         }
     }
 }
