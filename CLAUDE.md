@@ -20,10 +20,10 @@ Chi tiết từng form nằm trong `docs/KE_HOACH_TRIEN_KHAI.md`; nghiệp vụ 
 | Lớp dùng chung `Core/` (9 file) | Xong, Rebuild 0 lỗi 0 cảnh báo (14/10/2026) |
 | `.csproj` đã khai báo Core, BCrypt.Net-Next 4.2.0, System.Configuration, 2 target tạo `connectionStrings.config` | Xong |
 | `Program.cs` | CODE TẠM: tự đăng nhập `admin` rồi mở `frmFrontDesk` (chưa có frmLogin/frmMain). `Form1` đã xóa |
-| Git | **Thư mục chưa phải repo Git**. Đã có `.gitignore`, `.gitattributes` |
+| Git | Repo GitHub `MinhTuan0305/.Net-hotel-management-major-assignement`, nhánh `main` |
 | `database/reset_db.bat` | Xong (14/10/2026), đã thử nhánh hỏi server/hủy; chưa chạy thật trọn 01→03→02 |
 | `database/CHANGELOG.md` | Xong (15/10/2026). Mỗi lần sửa script DB thì thêm mục mới lên đầu |
-| 23 form | `frmFrontDesk` xong khung (build sạch, chưa thử F5); các nút mở form chưa có đang báo "đang xây dựng" |
+| 23 form | Đã tạo file trống cho cả 23 form + `ucSettlement` (20/10/2026): mẫu mặc định của VS, có sẵn constructor đã chốt. `frmFrontDesk` xong khung (build sạch, chưa thử F5); các nút của nó vẫn báo "đang xây dựng" |
 
 Khi xong một hạng mục, cập nhật bảng này và cột "Trạng thái" ở mục 7.
 
@@ -38,13 +38,17 @@ Hotel_management_system/              <- thư mục gốc = thư mục project (
   connectionStrings.config            <- riêng từng máy, KHÔNG lên Git, tự tạo khi build
   Program.cs
   Core/                               <- lớp dùng chung, namespace HotelManagement.Core
-  Forms/                              <- (sẽ tạo) System/ Catalog/ Booking/ Stay/ Billing/ Operations/
+  Forms/                              <- Main/ Catalog/ Booking/ Stay/ Billing/ Operations/ (đủ 23 form + ucSettlement)
   Properties/
   database/  01_HotelManagement_TaoDB.sql, 02_..._DuLieuMau.sql, 03_..._KiemThu.sql
   docs/      Tai_lieu_nghiep_vu.md (+ .docx gốc), KE_HOACH_TRIEN_KHAI.md
 ```
 
-- RootNamespace của project là `Hotel_management_system`. Form đặt trong `Forms/<Nhóm>/` có namespace `Hotel_management_system.Forms.<Nhóm>`.- Core dùng namespace `HotelManagement.Core`. Mọi form phải có `using HotelManagement.Core;`.
+- RootNamespace của project là `Hotel_management_system`. Form đặt trong `Forms/<Nhóm>/` có namespace `Hotel_management_system.Forms.<Nhóm>`.
+- **Không đặt thư mục/namespace tên `System`** (vd. `Forms.System`): mọi `System.Windows.Forms...` trong file Designer sẽ bị hiểu nhầm và hỏng build cả project. Vì vậy frmLogin, frmMain, dlgChangePassword nằm ở `Forms/Main`.
+- Form ở thư mục khác thì thêm `using` namespace của thư mục đó (vd. frmFrontDesk mở dlgPayment cần `using Hotel_management_system.Forms.Billing;`).
+- Trong `.csproj`, form khai báo theo **khối `<ItemGroup>` riêng của từng người** (có comment tên). Thêm form mới thì thêm vào đúng khối của mình, để tránh xung đột Git.
+- Core dùng namespace `HotelManagement.Core`. Mọi form phải có `using HotelManagement.Core;`.
 
 ## 4. Build, chạy, database
 
@@ -192,9 +196,9 @@ Thư mục và namespace theo nhóm. "A/M/R/H" = Admin/Manager/Receptionist/Hous
 
 | # | Form | Thư mục | Người làm | Quyền | Trạng thái |
 | --- | --- | --- | --- | --- | --- |
-| 1 | frmLogin | Forms/System | A | tất cả | chưa |
-| 2 | frmMain | Forms/System | A | tất cả | chưa |
-| 3 | dlgChangePassword | Forms/System | A | tất cả | chưa |
+| 1 | frmLogin | Forms/Main | A | tất cả | chưa |
+| 2 | frmMain | Forms/Main | A | tất cả | chưa |
+| 3 | dlgChangePassword | Forms/Main | A | tất cả | chưa |
 | 4 | frmEmployees | Forms/Catalog | A | A | chưa |
 | 5 | frmCustomers | Forms/Catalog | B | A,M,R | chưa |
 | 6 | frmRoomTypes | Forms/Catalog | B | A,M | chưa |

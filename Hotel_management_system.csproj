@@ -56,12 +56,6 @@
     <Compile Include="Core\PasswordHasher.cs" />
     <Compile Include="Core\Session.cs" />
     <Compile Include="Core\UiHelper.cs" />
-    <Compile Include="Forms\Stay\frmFrontDesk.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Stay\frmFrontDesk.Designer.cs">
-      <DependentUpon>frmFrontDesk.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -81,6 +75,163 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <!-- Form của từng người: mỗi người chỉ thêm dòng vào khối của mình để tránh xung đột Git. -->
+  <!-- A: Forms\Main, frmEmployees, frmReports -->
+  <ItemGroup>
+    <Compile Include="Forms\Main\frmLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Main\frmLogin.Designer.cs">
+      <DependentUpon>frmLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Main\frmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Main\frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Main\dlgChangePassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Main\dlgChangePassword.Designer.cs">
+      <DependentUpon>dlgChangePassword.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Catalog\frmEmployees.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Catalog\frmEmployees.Designer.cs">
+      <DependentUpon>frmEmployees.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Operations\frmReports.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Operations\frmReports.Designer.cs">
+      <DependentUpon>frmReports.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <!-- B: Forms\Catalog -->
+  <ItemGroup>
+    <Compile Include="Forms\Catalog\frmCustomers.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Catalog\frmCustomers.Designer.cs">
+      <DependentUpon>frmCustomers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Catalog\frmRoomTypes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Catalog\frmRoomTypes.Designer.cs">
+      <DependentUpon>frmRoomTypes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Catalog\frmAmenities.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Catalog\frmAmenities.Designer.cs">
+      <DependentUpon>frmAmenities.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Catalog\frmRooms.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Catalog\frmRooms.Designer.cs">
+      <DependentUpon>frmRooms.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Catalog\frmServices.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Catalog\frmServices.Designer.cs">
+      <DependentUpon>frmServices.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <!-- C: Forms\Booking, dlgPayment, frmPaymentLedger, frmHousekeeping -->
+  <ItemGroup>
+    <Compile Include="Forms\Booking\frmBookings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Booking\frmBookings.Designer.cs">
+      <DependentUpon>frmBookings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Booking\frmBookingEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Booking\frmBookingEdit.Designer.cs">
+      <DependentUpon>frmBookingEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Booking\dlgCancel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Booking\dlgCancel.Designer.cs">
+      <DependentUpon>dlgCancel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Billing\dlgPayment.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Billing\dlgPayment.Designer.cs">
+      <DependentUpon>dlgPayment.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Billing\frmPaymentLedger.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Billing\frmPaymentLedger.Designer.cs">
+      <DependentUpon>frmPaymentLedger.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Operations\frmHousekeeping.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Operations\frmHousekeeping.Designer.cs">
+      <DependentUpon>frmHousekeeping.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <!-- Tuấn: Forms\Stay, frmInvoices, frmInvoicePrint -->
+  <ItemGroup>
+    <Compile Include="Forms\Stay\frmFrontDesk.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Stay\frmFrontDesk.Designer.cs">
+      <DependentUpon>frmFrontDesk.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Stay\dlgCheckIn.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Stay\dlgCheckIn.Designer.cs">
+      <DependentUpon>dlgCheckIn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Stay\frmServiceUsage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Stay\frmServiceUsage.Designer.cs">
+      <DependentUpon>frmServiceUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Stay\dlgExtendStay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Stay\dlgExtendStay.Designer.cs">
+      <DependentUpon>dlgExtendStay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Stay\frmCheckOut.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Stay\frmCheckOut.Designer.cs">
+      <DependentUpon>frmCheckOut.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Stay\ucSettlement.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Stay\ucSettlement.Designer.cs">
+      <DependentUpon>ucSettlement.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Billing\frmInvoices.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Billing\frmInvoices.Designer.cs">
+      <DependentUpon>frmInvoices.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Billing\frmInvoicePrint.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Billing\frmInvoicePrint.Designer.cs">
+      <DependentUpon>frmInvoicePrint.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

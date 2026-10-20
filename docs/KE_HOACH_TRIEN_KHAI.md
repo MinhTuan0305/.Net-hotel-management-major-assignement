@@ -22,7 +22,7 @@ Mỗi cuối tuần: gộp code, chạy lại DB, chạy kịch bản xuyên su�
 
 ---
 
-## 1. Khung ứng dụng (Forms/System)
+## 1. Khung ứng dụng (Forms/Main)
 
 ### frmLogin – tất cả
 - Giao diện: tên đăng nhập, mật khẩu (`UseSystemPasswordChar`), nút Đăng nhập/Thoát, Enter để đăng nhập.
