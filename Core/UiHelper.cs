@@ -312,6 +312,42 @@ namespace HotelManagement.Core
             return false;
         }
 
+        /// <summary>Email dạng ten@mien.xx (kiểm tra sơ bộ). Chuỗi rỗng coi như hợp lệ (trường không bắt buộc).</summary>
+        public static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return true;
+            return System.Text.RegularExpressions.Regex.IsMatch(email.Trim(), @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+        }
+
+        /// <summary>SĐT: 8–15 chữ số, cho phép dấu + ở đầu và dấu cách, chấm, gạch ngang. Rỗng coi như hợp lệ.</summary>
+        public static bool IsValidPhone(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone)) return true;
+            string s = phone.Trim();
+            if (s.StartsWith("+", StringComparison.Ordinal)) s = s.Substring(1);
+            int digits = 0;
+            foreach (char c in s)
+            {
+                if (c >= '0' && c <= '9') digits++;
+                else if (c != ' ' && c != '.' && c != '-') return false;
+            }
+            return digits >= 8 && digits <= 15;
+        }
+
+        /// <summary>CCCD/hộ chiếu: 6–20 ký tự, chỉ chữ cái không dấu và chữ số. Rỗng coi như hợp lệ.</summary>
+        public static bool IsValidIdNumber(string idNumber)
+        {
+            if (string.IsNullOrWhiteSpace(idNumber)) return true;
+            string s = idNumber.Trim();
+            if (s.Length < 6 || s.Length > 20) return false;
+            foreach (char c in s)
+            {
+                bool ok = (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+                if (!ok) return false;
+            }
+            return true;
+        }
+
         // ==================================================================
         // 4. Phân quyền giao diện
         // ==================================================================
@@ -330,6 +366,19 @@ namespace HotelManagement.Core
         public static void EnabledFor(Control control, params string[] roles)
         {
             control.Enabled = Session.HasRole(roles);
+        }
+
+        /// <summary>
+        /// Chặn mở form ngoài quyền (tài liệu nghiệp vụ mục 1: chỉ ẩn menu là chưa đủ).
+        /// Gọi đầu sự kiện Load:  if (!UiHelper.RequireRole(this, Roles.Admin, Roles.Manager)) return;
+        /// Không đủ quyền thì báo và tự đóng form.
+        /// </summary>
+        public static bool RequireRole(Form form, params string[] roles)
+        {
+            if (Session.HasRole(roles)) return true;
+            Warn("Bạn không có quyền mở chức năng này.", form);
+            form.BeginInvoke(new Action(form.Close));
+            return false;
         }
 
         public static void SetEnabled(bool enabled, params Control[] controls)
@@ -381,6 +430,56 @@ namespace HotelManagement.Core
             {
                 cancelButton.DialogResult = DialogResult.Cancel;
                 dlg.CancelButton = cancelButton;
+            }
+        }
+
+        /// <summary>
+        /// Hộp nhập chữ nhanh (lý do void, ghi chú bảo trì, ghi chú báo hỏng...). Trả false nếu bấm Hủy.
+        ///   string reason;
+        ///   if (!UiHelper.InputText(this, "Void hóa đơn", "Lý do void:", out reason)) return;
+        /// required = true thì không cho để trống.
+        /// </summary>
+        public static bool InputText(IWin32Window owner, string title, string prompt, out string value,
+                                     bool required = true, string initialText = "", int maxLength = 200)
+        {
+            value = null;
+            using (var dlg = new Form())
+            {
+                var lbl = new Label();
+                var txt = new TextBox();
+                var ok = new Button();
+                var cancel = new Button();
+
+                dlg.Text = title;
+                dlg.Font = new Font("Segoe UI", 9F);
+                dlg.ClientSize = new Size(440, 132);
+                lbl.AutoSize = false;
+                lbl.Text = prompt;
+                lbl.SetBounds(12, 10, 416, 36);
+                txt.MaxLength = maxLength;
+                txt.Text = initialText ?? "";
+                txt.SetBounds(12, 50, 416, 23);
+                ok.Text = "Đồng ý";
+                ok.SetBounds(252, 92, 85, 28);
+                cancel.Text = "Hủy";
+                cancel.SetBounds(343, 92, 85, 28);
+                dlg.Controls.AddRange(new Control[] { lbl, txt, ok, cancel });
+                SetupDialog(dlg, ok, cancel);
+
+                ok.Click += (sender, e) =>
+                {
+                    if (required && string.IsNullOrWhiteSpace(txt.Text))
+                    {
+                        Warn("Không được để trống.", dlg);
+                        txt.Focus();
+                        return;
+                    }
+                    dlg.DialogResult = DialogResult.OK;
+                };
+
+                if (dlg.ShowDialog(owner) != DialogResult.OK) return false;
+                value = txt.Text.Trim();
+                return true;
             }
         }
 

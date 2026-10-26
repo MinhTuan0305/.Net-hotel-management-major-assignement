@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using HotelManagement.Core;
+using Hotel_management_system.Forms.Billing;
+using Hotel_management_system.Forms.Booking;
 
 namespace Hotel_management_system.Forms.Stay
 {
@@ -83,6 +85,7 @@ ORDER BY s.CheckOutDate, s.RoomNumber;";
 
         private void frmFrontDesk_Load(object sender, EventArgs e)
         {
+            if (!UiHelper.RequireRole(this, Roles.Admin, Roles.Manager, Roles.Receptionist)) return;
             // Form khác lưu xong (check-in, thu tiền, check-out...) thì 3 tab tự nạp lại.
             FormManager.Subscribe(this, OnDataChanged);
             ShowButtonsForCurrentTab();
@@ -369,36 +372,32 @@ ORDER BY s.CheckOutDate, s.RoomNumber;";
         }
 
         // ==================================================================
-        // Thao tác. Form nào chưa có thì báo "đang xây dựng"; làm xong form nào thì
-        // bỏ dòng NotReady và mở comment phía trên. Hộp thoại lưu xong tự gọi
-        // FormManager.NotifyDataChanged, form này nghe được và tự nạp lại (OnDataChanged);
-        // vẫn gọi RequestReload khi trả OK để chắc chắn nạp lại dù hộp thoại quên báo.
+        // Thao tác. Hộp thoại lưu xong tự gọi FormManager.NotifyDataChanged, form này nghe được
+        // và tự nạp lại (OnDataChanged); vẫn gọi RequestReload khi trả OK để chắc chắn nạp lại.
         // ==================================================================
 
         private void btnCheckIn_Click(object sender, EventArgs e)
         {
             int? id = SelectedStayId();
             if (id == null) return;
-            // if (FormManager.ShowDialog(new dlgCheckIn(id.Value), this)) RequestReload();
-            NotReady("Check-in", "dlgCheckIn");
+            if (FormManager.ShowDialog(new dlgCheckIn(id.Value), this)) RequestReload();
         }
 
         private void btnChangeRoom_Click(object sender, EventArgs e)
         {
             int? bookingId = SelectedBookingId();
             if (bookingId == null) return;
-            // Form của bạn C, mở không chặn (không phải hộp thoại):
-            // FormManager.Open("booking-" + bookingId.Value, () => new frmBookingEdit(bookingId));
-            NotReady("Đổi phòng", "frmBookingEdit – phần của bạn C");
+            // Mở không chặn (không phải hộp thoại); mỗi phiếu một cửa sổ. Sửa xong form đó tự báo DataChanged.
+            int id = bookingId.Value;
+            FormManager.Open("booking-" + id, () => new frmBookingEdit(id));
         }
 
         private void btnDeposit_Click(object sender, EventArgs e)
         {
             int? bookingId = SelectedBookingId();
             if (bookingId == null) return;
-            // Form của bạn C. Cọc tính theo cả phiếu nên truyền BookingId:
-            // if (FormManager.ShowDialog(new dlgPayment(PaymentMode.Deposit, bookingId.Value), this)) RequestReload();
-            NotReady("Thu cọc", "dlgPayment – phần của bạn C");
+            // Cọc tính theo cả phiếu nên truyền BookingId.
+            if (FormManager.ShowDialog(new dlgPayment(PaymentMode.Deposit, bookingId.Value), this)) RequestReload();
         }
 
         private void btnCancelBooking_Click(object sender, EventArgs e)
@@ -406,49 +405,39 @@ ORDER BY s.CheckOutDate, s.RoomNumber;";
             int? bookingId = SelectedBookingId();
             int? id = SelectedStayId();
             if (bookingId == null || id == null) return;
-            // Form của bạn C. Truyền cả BookingRoomId để chỉ hủy phòng đang chọn:
-            // if (FormManager.ShowDialog(new dlgCancel(bookingId.Value, id), this)) RequestReload();
-            NotReady("Hủy / No-show", "dlgCancel – phần của bạn C");
+            // Truyền cả BookingRoomId để chỉ hủy phòng đang chọn (có ô no-show trong hộp thoại).
+            if (FormManager.ShowDialog(new dlgCancel(bookingId.Value, id), this)) RequestReload();
         }
 
         private void btnServices_Click(object sender, EventArgs e)
         {
             int? id = SelectedStayId();
             if (id == null) return;
-            // Form lớn, mỗi phòng một cửa sổ (mở song song được phòng 101 và 205):
-            // FormManager.Open("stay-" + id.Value, () => new frmServiceUsage(id.Value));
-            NotReady("Dịch vụ", "frmServiceUsage");
+            // Form lớn, mỗi phòng một cửa sổ (mở song song được phòng 101 và 205).
+            int stayId = id.Value;
+            FormManager.Open("stay-" + stayId, () => new frmServiceUsage(stayId));
         }
 
         private void btnPayment_Click(object sender, EventArgs e)
         {
             int? id = SelectedStayId();
             if (id == null) return;
-            // Form của bạn C:
-            // if (FormManager.ShowDialog(new dlgPayment(PaymentMode.StayPayment, id.Value), this)) RequestReload();
-            NotReady("Thu tiền", "dlgPayment – phần của bạn C");
+            if (FormManager.ShowDialog(new dlgPayment(PaymentMode.StayPayment, id.Value), this)) RequestReload();
         }
 
         private void btnExtend_Click(object sender, EventArgs e)
         {
             int? id = SelectedStayId();
             if (id == null) return;
-            // if (FormManager.ShowDialog(new dlgExtendStay(id.Value), this)) RequestReload();
-            NotReady("Gia hạn", "dlgExtendStay");
+            if (FormManager.ShowDialog(new dlgExtendStay(id.Value), this)) RequestReload();
         }
 
         private void btnCheckOut_Click(object sender, EventArgs e)
         {
             int? id = SelectedStayId();
             if (id == null) return;
-            // Mở dạng hộp thoại để lễ tân làm xong một phòng rồi mới sang phòng khác:
-            // if (FormManager.ShowDialog(new frmCheckOut(id.Value), this)) RequestReload();
-            NotReady("Check-out", "frmCheckOut");
-        }
-
-        private void NotReady(string action, string formName)
-        {
-            UiHelper.Info(action + ": chức năng đang được xây dựng (" + formName + ").", this);
+            // Mở dạng hộp thoại để lễ tân làm xong một phòng rồi mới sang phòng khác.
+            if (FormManager.ShowDialog(new frmCheckOut(id.Value), this)) RequestReload();
         }
 
         // ==================================================================

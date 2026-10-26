@@ -12,18 +12,18 @@ Chi tiết từng form nằm trong `docs/KE_HOACH_TRIEN_KHAI.md`; nghiệp vụ 
 - Các thành viên khác làm phần còn lại (xem mục 7). Khi Tuấn nhờ làm form của người khác thì vẫn làm, nhưng nhắc rằng form đó thuộc phần ai.
 - Trả lời và viết chú thích bằng **tiếng Việt có dấu**. Giải thích ngắn gọn vì sao làm vậy, vì người dùng đang học.
 
-## 2. Trạng thái hiện tại (cập nhật 14/10/2026)
+## 2. Trạng thái hiện tại (cập nhật 26/10/2026)
 
 | Hạng mục | Trạng thái |
 | --- | --- |
 | Database: 3 script `database/01..03` | Xong, đã chạy trên SQL Server 2022, file `03` PASS hết (14/10/2026) |
-| Lớp dùng chung `Core/` (9 file) | Xong, Rebuild 0 lỗi 0 cảnh báo (14/10/2026) |
-| `.csproj` đã khai báo Core, BCrypt.Net-Next 4.2.0, System.Configuration, 2 target tạo `connectionStrings.config` | Xong |
-| `Program.cs` | CODE TẠM: tự đăng nhập `admin` rồi mở `frmFrontDesk` (chưa có frmLogin/frmMain). `Form1` đã xóa |
+| Lớp dùng chung `Core/` (9 file) | Xong. 26/10 thêm 7 hàm mới (không đổi hàm cũ): `UiHelper.RequireRole`, `InputText`, `IsValidEmail/Phone/IdNumber`; `DbHelper.LikeContains`, `ScalarTx` – xem `Core/README.md` |
+| `.csproj` đã khai báo Core, BCrypt.Net-Next 4.2.0, System.Configuration, System.Windows.Forms.DataVisualization (biểu đồ frmReports), 2 target tạo `connectionStrings.config` | Xong |
+| `Program.cs` | Xong (26/10): vòng lặp frmLogin → frmMain, Đăng xuất quay lại frmLogin. Đã bỏ code tạm |
 | Git | Repo GitHub `MinhTuan0305/.Net-hotel-management-major-assignement`, nhánh `main` |
 | `database/reset_db.bat` | Xong (14/10/2026), đã thử nhánh hỏi server/hủy; chưa chạy thật trọn 01→03→02 |
 | `database/CHANGELOG.md` | Xong (15/10/2026). Mỗi lần sửa script DB thì thêm mục mới lên đầu |
-| 23 form | Đã tạo file trống cho cả 23 form + `ucSettlement` (20/10/2026): mẫu mặc định của VS, có sẵn constructor đã chốt. `frmFrontDesk` xong khung (build sạch, chưa thử F5); các nút của nó vẫn báo "đang xây dựng" |
+| 23 form | 26/10: đã viết code đủ 23 form + `ucSettlement` + form bổ sung `dlgReissueInvoice` (Forms/Billing). Rebuild 0 lỗi 0 cảnh báo; 36 câu SQL hằng số chạy thử trên DB đều OK; tên tham số procedure khớp DB. **Chưa thử F5** – xem kịch bản thử trong báo cáo/kế hoạch mục 7 |
 
 Khi xong một hạng mục, cập nhật bảng này và cột "Trạng thái" ở mục 7.
 
@@ -196,40 +196,42 @@ Thư mục và namespace theo nhóm. "A/M/R/H" = Admin/Manager/Receptionist/Hous
 
 | # | Form | Thư mục | Người làm | Quyền | Trạng thái |
 | --- | --- | --- | --- | --- | --- |
-| 1 | frmLogin | Forms/Main | A | tất cả | chưa |
-| 2 | frmMain | Forms/Main | A | tất cả | chưa |
-| 3 | dlgChangePassword | Forms/Main | A | tất cả | chưa |
-| 4 | frmEmployees | Forms/Catalog | A | A | chưa |
-| 5 | frmCustomers | Forms/Catalog | B | A,M,R | chưa |
-| 6 | frmRoomTypes | Forms/Catalog | B | A,M | chưa |
-| 7 | frmAmenities | Forms/Catalog | B | A,M | chưa |
-| 8 | frmRooms | Forms/Catalog | B | A,M (R xem) | chưa |
-| 9 | frmServices | Forms/Catalog | B | A,M (R xem) | chưa |
-| 10 | frmBookings | Forms/Booking | C | A,M,R | chưa |
-| 11 | frmBookingEdit | Forms/Booking | C | A,M,R | chưa |
-| 12 | dlgCancel | Forms/Booking | C | A,M,R | chưa |
-| 13 | dlgPayment | Forms/Billing | C | A,M,R (hoàn: A,M) | chưa |
-| 14 | **frmFrontDesk** | Forms/Stay | **Tuấn** | A,M,R | khung xong, chờ nối dlgCheckIn... |
-| 15 | **dlgCheckIn** | Forms/Stay | **Tuấn** | A,M,R | chưa |
-| 16 | **frmServiceUsage** | Forms/Stay | **Tuấn** | A,M,R | chưa |
-| 17 | **dlgExtendStay** | Forms/Stay | **Tuấn** | A,M,R | chưa |
-| 18 | **frmCheckOut** | Forms/Stay | **Tuấn** | A,M,R | chưa |
-| 19 | **frmInvoices** | Forms/Billing | **Tuấn** | A,M,R (void/lập lại: A,M) | chưa |
-| 20 | **frmInvoicePrint** | Forms/Billing | **Tuấn** | A,M,R | chưa |
-| 21 | frmPaymentLedger | Forms/Billing | C | A,M | chưa |
-| 22 | frmHousekeeping | Forms/Operations | C | H,A,M (R xem) | chưa |
-| 23 | frmReports | Forms/Operations | A | A,M | chưa |
+| 1 | frmLogin | Forms/Main | A | tất cả | code xong 26/10, chưa F5 |
+| 2 | frmMain | Forms/Main | A | tất cả | code xong 26/10, chưa F5 |
+| 3 | dlgChangePassword | Forms/Main | A | tất cả | code xong 26/10, chưa F5 |
+| 4 | frmEmployees | Forms/Catalog | A | A | code xong 26/10, chưa F5 |
+| 5 | frmCustomers | Forms/Catalog | B | A,M,R | code xong 26/10, chưa F5 |
+| 6 | frmRoomTypes | Forms/Catalog | B | A,M | code xong 26/10, chưa F5 |
+| 7 | frmAmenities | Forms/Catalog | B | A,M | code xong 26/10, chưa F5 |
+| 8 | frmRooms | Forms/Catalog | B | A,M (R xem) | code xong 26/10, chưa F5 |
+| 9 | frmServices | Forms/Catalog | B | A,M (R xem) | code xong 26/10, chưa F5 |
+| 10 | frmBookings | Forms/Booking | C | A,M,R | code xong 26/10, chưa F5 |
+| 11 | frmBookingEdit | Forms/Booking | C | A,M,R | code xong 26/10, chưa F5 |
+| 12 | dlgCancel | Forms/Booking | C | A,M,R | code xong 26/10, chưa F5 |
+| 13 | dlgPayment | Forms/Billing | C | A,M,R (hoàn: A,M) | code xong 26/10, chưa F5 |
+| 14 | **frmFrontDesk** | Forms/Stay | **Tuấn** | A,M,R | code xong 26/10, chưa F5 |
+| 15 | **dlgCheckIn** | Forms/Stay | **Tuấn** | A,M,R | code xong 26/10, chưa F5 |
+| 16 | **frmServiceUsage** | Forms/Stay | **Tuấn** | A,M,R | code xong 26/10, chưa F5 |
+| 17 | **dlgExtendStay** | Forms/Stay | **Tuấn** | A,M,R | code xong 26/10, chưa F5 |
+| 18 | **frmCheckOut** | Forms/Stay | **Tuấn** | A,M,R | code xong 26/10, chưa F5 |
+| 19 | **frmInvoices** | Forms/Billing | **Tuấn** | A,M,R (void/lập lại: A,M) | code xong 26/10, chưa F5 |
+| 20 | **frmInvoicePrint** | Forms/Billing | **Tuấn** | A,M,R | code xong 26/10, chưa F5 |
+| 21 | frmPaymentLedger | Forms/Billing | C | A,M | code xong 26/10, chưa F5 |
+| 22 | frmHousekeeping | Forms/Operations | C | H,A,M (R xem) | code xong 26/10, chưa F5 |
+| 23 | frmReports | Forms/Operations | A | A,M | code xong 26/10, chưa F5 |
+| 24 | dlgReissueInvoice (bổ sung) | Forms/Billing | **Tuấn** | A,M | code xong 26/10, chưa F5 – lập lại hóa đơn sau void, dùng `ucSettlement` |
 
 **Constructor đã chốt** (form của người này mở form của người kia, nên không được đổi):
 
 | Form | Constructor |
 | --- | --- |
-| frmCustomers | `(bool pickMode = false)`, chọn xong có thuộc tính `SelectedCustomerId` |
+| frmCustomers | `()` và `(bool pickMode)` (tách 2 constructor vì `FormManager.Open<T>()` cần constructor không tham số), chọn xong có thuộc tính `SelectedCustomerId` |
 | frmBookingEdit | `(int? bookingId)` – null là tạo mới |
 | dlgCancel | `(int bookingId, int? bookingRoomId)` – null là hủy cả phiếu |
 | dlgPayment | `(PaymentMode mode, int id)` – Deposit nhận BookingId; StayPayment/Refund nhận BookingRoomId |
 | dlgCheckIn, frmServiceUsage, dlgExtendStay, frmCheckOut | `(int bookingRoomId)` |
 | frmInvoicePrint | `(int invoiceId)` |
+| dlgReissueInvoice | `(int bookingRoomId, int voidInvoiceId)` |
 | frmMain | có `public bool LoggedOut { get; private set; }` (Program.cs dùng) |
 
 Đặc tả chi tiết từng form (giao diện, procedure gọi, điều kiện "xong khi", ca kiểm thử): `docs/KE_HOACH_TRIEN_KHAI.md`.
