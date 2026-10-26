@@ -181,6 +181,8 @@ Mọi thao tác theo `BookingRoomId`, bắt đầu từ `frmFrontDesk`. Có th�
 - Xem/In → `frmInvoicePrint`.
 - Void: lý do bắt buộc, `UiHelper.Confirm(..., defaultNo: true)` → `sp_VoidInvoice`.
 - Lập lại: chỉ bật khi phòng đã trả và hóa đơn mới nhất là Void → `ucSettlement` → `sp_ReissueInvoice` → in hóa đơn mới.
+  Đã làm thành hộp thoại riêng `dlgReissueInvoice(int bookingRoomId, int voidInvoiceId)` trong `Forms/Billing`
+  (bảng tính tạm + `ucSettlement`), kèm nút "Sửa dịch vụ phòng" để sửa dịch vụ sau khi void.
 - Cột "Thay cho" hiện số hóa đơn cũ (`ReplacesInvoiceId`).
 
 ### frmPaymentLedger (A, M) – C

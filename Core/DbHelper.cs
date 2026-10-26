@@ -234,6 +234,25 @@ namespace HotelManagement.Core
             }
         }
 
+        /// <summary>
+        /// Lấy một giá trị bên trong InTransaction (vd. id vừa INSERT bằng SELECT SCOPE_IDENTITY()).
+        /// NULL trả về defaultValue.
+        /// </summary>
+        public static T ScalarTx<T>(SqlConnection conn, SqlTransaction tx, string sql, params SqlParameter[] ps)
+        {
+            using (SqlCommand cmd = CreateCommand(conn, tx, sql, CommandType.Text, ps))
+            {
+                try
+                {
+                    return ConvertValue<T>(cmd.ExecuteScalar(), default(T));
+                }
+                finally
+                {
+                    cmd.Parameters.Clear();
+                }
+            }
+        }
+
         // ------------------------------------------------------------------
         // Tạo tham số
         // ------------------------------------------------------------------
@@ -282,6 +301,19 @@ namespace HotelManagement.Core
                     break;
             }
             return p;
+        }
+
+        /// <summary>
+        /// Chuỗi tìm kiếm "chứa" cho LIKE: thoát ký tự đặc biệt [ % _ rồi bọc %...%.
+        /// Ô trống trả null, dùng với điều kiện "@Kw IS NULL OR ...":
+        ///   "WHERE (@Kw IS NULL OR FullName COLLATE Vietnamese_CI_AI LIKE @Kw)",
+        ///   DbHelper.P("@Kw", DbHelper.LikeContains(txtSearch.Text))
+        /// </summary>
+        public static string LikeContains(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return null;
+            string s = text.Trim().Replace("[", "[[]").Replace("%", "[%]").Replace("_", "[_]");
+            return "%" + s + "%";
         }
 
         /// <summary>Tham số kiểu bảng (table-valued parameter), vd. @Rooms dbo.BookingRoomInput.</summary>

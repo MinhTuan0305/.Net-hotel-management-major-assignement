@@ -16,6 +16,16 @@ Code viết cho .NET Framework 4.8 / C# 7.3.
 | `UiHelper.cs` | Kiểu lưới chung, gán dữ liệu, đặt tiêu đề cột, dịch trạng thái, tô màu, hộp thông báo, kiểm tra nhập, phân quyền giao diện, xuất CSV | `StyleGrid`, `Bind`, `ShowColumns`, `Confirm` |
 | `FormManager.cs` | Mở form / hộp thoại theo một cách chung, báo "dữ liệu đã đổi" cho màn hình khác | `Open<T>()`, `ShowDialog(...)`, `NotifyDataChanged` |
 
+**Hàm bổ sung ngày 26/10/2026** (chỉ thêm mới, không đổi hàm cũ):
+
+| Hàm | Để làm gì |
+| --- | --- |
+| `UiHelper.RequireRole(form, roles...)` | Gọi đầu `Load`: không đủ quyền thì báo và tự đóng form (ẩn menu thôi là chưa đủ) |
+| `UiHelper.InputText(owner, title, prompt, out value, ...)` | Hộp nhập nhanh một dòng: lý do void, ghi chú bảo trì, báo hỏng |
+| `UiHelper.IsValidEmail / IsValidPhone / IsValidIdNumber` | Kiểm tra định dạng email, SĐT (8–15 số), CCCD/hộ chiếu (6–20 chữ/số); chuỗi rỗng coi là hợp lệ |
+| `DbHelper.LikeContains(text)` | Chuỗi tìm kiếm cho LIKE: thoát `[ % _` rồi bọc `%...%`; ô trống trả `null` |
+| `DbHelper.ScalarTx<T>(conn, tx, sql, ...)` | Lấy một giá trị bên trong `InTransaction` (vd. id vừa INSERT) |
+
 Ngoài thư mục Core còn có 4 file ở gốc project:
 
 | File | Để làm gì | Lên Git? |
