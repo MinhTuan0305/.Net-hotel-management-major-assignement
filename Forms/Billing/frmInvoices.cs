@@ -52,6 +52,9 @@ FROM dbo.vw_InvoiceLines WHERE InvoiceId = @Id ORDER BY LineNumber;";
             UiHelper.StyleGrid(dgvLines);
             UiHelper.TranslateColumn(dgvInvoices, "Status", InvoiceStatus.ToVietnamese);
             UiHelper.ColorRows(dgvInvoices, "Status", s => s == InvoiceStatus.Void ? VoidColor : Color.Empty);
+            UiHelper.AddColorLegend(dgvInvoices,
+                (Color.Empty, "Hóa đơn hiệu lực"),
+                (VoidColor, "Hóa đơn đã hủy (void)"));
         }
 
         private void frmInvoices_Load(object sender, EventArgs e)

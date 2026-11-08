@@ -53,6 +53,10 @@ ORDER BY s.RoomNumber;";
             UiHelper.TranslateColumn(dgvBookings, "Status", BookingStatus.ToVietnamese);
             UiHelper.TranslateColumn(dgvBookings, "HoldMinutesLeft", FormatHold);
             UiHelper.ColorRows(dgvBookings, "Status", ColorByStatus);
+            UiHelper.AddColorLegend(dgvBookings,
+                (PendingColor, BookingStatus.ToVietnamese(BookingStatus.Pending)),
+                (Color.Empty, "Đã xác nhận / đang lưu trú / đã trả phòng"),
+                (CancelledColor, BookingStatus.ToVietnamese(BookingStatus.Cancelled)));
             UiHelper.TranslateColumn(dgvRooms, "StayStatus", StayStatus.ToVietnamese);
             UiHelper.TranslateColumn(dgvRooms, "RoomStatus", RoomStatus.ToVietnamese);
         }

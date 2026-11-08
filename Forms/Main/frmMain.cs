@@ -16,7 +16,7 @@ namespace Hotel_management_system.Forms.Main
     /// Màn hình chính sau khi đăng nhập (mọi vai trò). Đặc tả: KE_HOACH mục 1; nghiệp vụ mục 1, 15.
     ///   - Menu ẩn/hiện theo vai trò (ma trận quyền I.1). Housekeeping chỉ thấy Hệ thống và Dọn phòng.
     ///   - Dải ô chỉ số trong ngày (sp_DashboardSummary; doanh thu chỉ Admin/Manager thấy).
-    ///   - Sơ đồ phòng (vw_RoomBoard) tô màu theo trạng thái, tự nạp lại khi form khác báo dữ liệu đổi.
+    ///   - Sơ đồ phòng (vw_RoomBoard), một màu nền, trạng thái ghi bằng chữ; tự nạp lại khi form khác báo dữ liệu đổi.
     ///   - Mở app thì gọi sp_ExpirePendingBookings để hủy phiếu chờ cọc quá 24 giờ.
     /// Program.cs đọc LoggedOut để biết người dùng bấm Đăng xuất (mở lại frmLogin) hay Thoát.
     /// </summary>
@@ -32,8 +32,9 @@ FROM dbo.vw_RoomBoard
 WHERE IsActive = 1
 ORDER BY Floor, RoomNumber;";
 
+        // Ô chỉ số và ô phòng dùng chung một màu nền, chữ số màu đen (không tô màu theo trạng thái).
         private static readonly Color TileBack = Color.FromArgb(235, 239, 245);
-        private static readonly Color TileValue = Color.FromArgb(31, 78, 121);
+        private static readonly Color TileValue = Color.Black;
 
         private bool _reloadPending;
 
@@ -156,10 +157,10 @@ ORDER BY Floor, RoomNumber;";
             DataTable dt = DbHelper.Query("dbo.sp_DashboardSummary", Session.EmployeeParam());
             DataRow r = dt.Rows[0];
             AddTile("Tổng số phòng", DbHelper.Value<int>(r, "TotalRooms").ToString());
-            AddTile("Phòng trống", DbHelper.Value<int>(r, "AvailableRooms").ToString(), RoomStatus.ToColor(RoomStatus.Available));
-            AddTile("Có khách", DbHelper.Value<int>(r, "OccupiedRooms").ToString(), RoomStatus.ToColor(RoomStatus.Occupied));
-            AddTile("Đang dọn", DbHelper.Value<int>(r, "CleaningRooms").ToString(), RoomStatus.ToColor(RoomStatus.Cleaning));
-            AddTile("Bảo trì", DbHelper.Value<int>(r, "MaintenanceRooms").ToString(), RoomStatus.ToColor(RoomStatus.Maintenance));
+            AddTile("Phòng trống", DbHelper.Value<int>(r, "AvailableRooms").ToString());
+            AddTile("Có khách", DbHelper.Value<int>(r, "OccupiedRooms").ToString());
+            AddTile("Đang dọn", DbHelper.Value<int>(r, "CleaningRooms").ToString());
+            AddTile("Bảo trì", DbHelper.Value<int>(r, "MaintenanceRooms").ToString());
             AddTile("Khách đến hôm nay", DbHelper.Value<int>(r, "ArrivalsToday").ToString());
             AddTile("Dự kiến trả", DbHelper.Value<int>(r, "DeparturesDue").ToString());
             AddTile("Đã nhận hôm nay", DbHelper.Value<int>(r, "CheckedInToday").ToString());
@@ -174,13 +175,13 @@ ORDER BY Floor, RoomNumber;";
             flpDashboard.ResumeLayout();
         }
 
-        private void AddTile(string title, string value, Color? back = null)
+        private void AddTile(string title, string value)
         {
             var tile = new Panel
             {
                 Size = new Size(140, 78),
                 Margin = new Padding(4),
-                BackColor = back ?? TileBack,
+                BackColor = TileBack,
                 BorderStyle = BorderStyle.FixedSingle
             };
             var lblValue = new Label
@@ -240,21 +241,24 @@ ORDER BY Floor, RoomNumber;";
             string guest = DbHelper.Value<string>(r, "CurrentGuest");
             string arriving = DbHelper.Value<string>(r, "ArrivingGuest");
 
-            string line3;
-            if (guest != null) line3 = guest;
-            else if (arriving != null) line3 = "Đến: " + arriving;
-            else line3 = RoomStatus.ToVietnamese(status);
+            // Ô phòng không tô màu nữa nên luôn ghi trạng thái bằng chữ (dòng 3);
+            // dòng 4 là khách đang ở hoặc khách đến hôm nay.
+            string text = DbHelper.Value<string>(r, "RoomNumber") + "\n" +
+                          DbHelper.Value<string>(r, "TypeName") + "\n" +
+                          RoomStatus.ToVietnamese(status);
+            if (guest != null) text += "\n" + guest;
+            else if (arriving != null) text += "\nĐến: " + arriving;
 
             var tile = new Label
             {
                 AutoSize = false,
-                Size = new Size(124, 72),
+                Size = new Size(124, 76),
                 Margin = new Padding(4),
                 BorderStyle = BorderStyle.FixedSingle,
-                BackColor = RoomStatus.ToColor(status),
+                BackColor = TileBack,
+                ForeColor = Color.Black,
                 TextAlign = ContentAlignment.MiddleCenter,
-                Text = DbHelper.Value<string>(r, "RoomNumber") + "\n" +
-                       DbHelper.Value<string>(r, "TypeName") + "\n" + line3,
+                Text = text,
                 Tag = r,
                 Cursor = Cursors.Hand
             };

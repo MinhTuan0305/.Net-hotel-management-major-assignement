@@ -35,6 +35,9 @@ ORDER BY IsSystem, Category, ServiceName;";
             UiHelper.SetupMoneyInput(nudPrice);
             UiHelper.ColorRows(dgvServices, "IsActive",
                 v => v == "False" ? System.Drawing.SystemColors.ControlLight : System.Drawing.Color.Empty);
+            UiHelper.AddColorLegend(dgvServices,
+                (System.Drawing.Color.Empty, "Đang bán"),
+                (System.Drawing.SystemColors.ControlLight, "Ngừng bán"));
         }
 
         private void frmServices_Load(object sender, EventArgs e)

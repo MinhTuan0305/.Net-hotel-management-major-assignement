@@ -64,6 +64,9 @@ ORDER BY s.RoomNumber;";
             UiHelper.TranslateColumn(dgvRooms, "StayStatus", StayStatus.ToVietnamese);
             UiHelper.ColorRows(dgvRooms, "StayStatus",
                 s => s == StayStatus.Cancelled ? System.Drawing.SystemColors.ControlLight : System.Drawing.Color.Empty);
+            UiHelper.AddColorLegend(dgvRooms,
+                (System.Drawing.Color.Empty, "Phòng còn hiệu lực"),
+                (System.Drawing.SystemColors.ControlLight, "Phòng đã hủy"));
         }
 
         private bool IsEditMode

@@ -33,6 +33,8 @@ JOIN dbo.Employees e ON e.EmployeeId = su.CreatedBy
 WHERE su.BookingRoomId = @Id
 ORDER BY su.UsedAt, su.UsageId;";
 
+        private static readonly Color SystemServiceColor = Color.FromArgb(255, 235, 156);   // vàng nhạt: phụ thu hệ thống
+
         private readonly int _bookingRoomId;
         private bool _editable;
         private int? _editingUsageId;
@@ -44,7 +46,10 @@ ORDER BY su.UsedAt, su.UsageId;";
             InitializeComponent();
             _bookingRoomId = bookingRoomId;
             UiHelper.StyleGrid(dgvUsages);
-            UiHelper.ColorRows(dgvUsages, "IsSystem", v => v == "True" ? Color.FromArgb(255, 235, 156) : Color.Empty);
+            UiHelper.ColorRows(dgvUsages, "IsSystem", v => v == "True" ? SystemServiceColor : Color.Empty);
+            UiHelper.AddColorLegend(dgvUsages,
+                (Color.Empty, "Dịch vụ khách dùng"),
+                (SystemServiceColor, "Phụ thu trả phòng trễ (hệ thống tự ghi)"));
         }
 
         private void frmServiceUsage_Load(object sender, EventArgs e)
