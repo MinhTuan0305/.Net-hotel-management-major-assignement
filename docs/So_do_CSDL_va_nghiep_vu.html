@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSDL khách sạn</title>
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --text:#1d2330; --muted:#5d6676; --line:#d7dce3;
+  --accent:#1f4e79; --accent-soft:#e3ecf6; --pk:#b26a00; --fk:#1f6fb2; --uq:#6b4fa3;
+  --edge:#3d5a80; --edge-audit:#8a94a6; --hl:#d9480f; --ok:#2b8a3e; --warn:#c77700; --bad:#c92a2a;
+  --tbl-head:#1f4e79; --tbl-head-text:#ffffff; --row-alt:#f7f9fb; --code-bg:#eef1f5;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#13161b; --surface:#1b1f26; --surface-2:#232832; --text:#e6e9ee; --muted:#9aa3b2; --line:#343b47;
+    --accent:#7fb0e0; --accent-soft:#1f2c3b; --pk:#f0a64a; --fk:#6cb4f0; --uq:#b59cf0;
+    --edge:#8fb3d9; --edge-audit:#6a7486; --hl:#ff8a4c; --ok:#5fcf75; --warn:#f0b440; --bad:#ff6b6b;
+    --tbl-head:#2a4a6b; --tbl-head-text:#f0f4f8; --row-alt:#1f242c; --code-bg:#262c36;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#13161b; --surface:#1b1f26; --surface-2:#232832; --text:#e6e9ee; --muted:#9aa3b2; --line:#343b47;
+  --accent:#7fb0e0; --accent-soft:#1f2c3b; --pk:#f0a64a; --fk:#6cb4f0; --uq:#b59cf0;
+  --edge:#8fb3d9; --edge-audit:#6a7486; --hl:#ff8a4c; --ok:#5fcf75; --warn:#f0b440; --bad:#ff6b6b;
+  --tbl-head:#2a4a6b; --tbl-head-text:#f0f4f8; --row-alt:#1f242c; --code-bg:#262c36;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+header{background:var(--surface);border-bottom:1px solid var(--line);padding:18px 16px 0}
+.wrap{max-width:1600px;margin:0 auto}
+h1{margin:0 0 4px;font-size:22px}
+.sub{color:var(--muted);margin:0 0 14px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);border-bottom:none;background:var(--surface-2);color:var(--muted);padding:9px 16px;border-radius:8px 8px 0 0;cursor:pointer;font:inherit;font-weight:600}
+.tab[aria-selected="true"]{background:var(--bg);color:var(--accent);position:relative;top:1px}
+main{padding:20px 16px 40px}
+section[hidden]{display:none}
+h2{font-size:18px;margin:26px 0 10px}
+h2:first-child{margin-top:0}
+h3{font-size:15px;margin:18px 0 8px}
+p{margin:6px 0}
+.muted{color:var(--muted)}
+code,.mono{font-family:Consolas,"Cascadia Mono",Menlo,monospace;font-size:12.5px}
+code{background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+.card h3{margin-top:0}
+.card ul{margin:6px 0;padding-left:20px}
+.card li{margin:3px 0}
+table.data{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.data th{background:var(--tbl-head);color:var(--tbl-head-text);text-align:left;padding:8px 10px;font-weight:600;white-space:nowrap}
+.data td{padding:7px 10px;border-top:1px solid var(--line);vertical-align:top}
+.data tr:nth-child(even) td{background:var(--row-alt)}
+.data td.name{font-family:Consolas,"Cascadia Mono",Menlo,monospace;font-size:12.5px;font-weight:600;white-space:nowrap}
+.scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+.pill.n{color:var(--fk);border-color:var(--fk)}
+.pill.one{color:var(--ok);border-color:var(--ok)}
+.pill.nn{color:var(--uq);border-color:var(--uq)}
+.pill.a{color:var(--muted)}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 10px}
+.toolbar label{display:flex;gap:6px;align-items:center;cursor:pointer}
+button.small{font:inherit;padding:5px 12px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer}
+button.small:hover{border-color:var(--accent)}
+.erd-box{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:82vh}
+#erd{display:block}
+#erd text{font-family:"Segoe UI",system-ui,Arial,sans-serif}
+.t-box{fill:var(--surface);stroke:var(--line);stroke-width:1.2}
+.t-head{fill:var(--tbl-head)}
+.t-title{fill:var(--tbl-head-text);font-weight:700;font-size:13px}
+.t-col{fill:var(--text);font-size:11.5px}
+.t-type{fill:var(--muted);font-size:10.5px}
+.t-badge{font-size:9.5px;font-weight:700}
+.b-pk{fill:var(--pk)} .b-fk{fill:var(--fk)} .b-uq{fill:var(--uq)} .b-cc{fill:var(--muted)}
+.t-rowhl{fill:var(--accent-soft)}
+.edge path.ln{fill:none;stroke:var(--edge);stroke-width:1.4}
+.edge .mk{fill:none;stroke:var(--edge);stroke-width:1.4}
+.edge .mkdot{fill:var(--surface);stroke:var(--edge);stroke-width:1.4}
+.edge.audit path.ln{stroke:var(--edge-audit);stroke-dasharray:5 4}
+.edge.audit .mk{stroke:var(--edge-audit)}
+.edge.audit .mkdot{stroke:var(--edge-audit)}
+.edge .hit{fill:none;stroke:transparent;stroke-width:10}
+svg.audit-off .edge.audit{display:none}
+svg.focus .edge{opacity:.12}
+svg.focus .tbl{opacity:.35}
+svg.focus .edge.hl{opacity:1}
+svg.focus .edge.hl path.ln,svg.focus .edge.hl .mk,svg.focus .edge.hl .mkdot{stroke:var(--hl);stroke-width:2.2}
+svg.focus .tbl.hl{opacity:1}
+svg.focus .tbl.hl .t-box{stroke:var(--hl);stroke-width:2}
+.legend-row{display:flex;gap:18px;flex-wrap:wrap;align-items:center;font-size:13px}
+.legend-row svg{vertical-align:middle}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.step{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:8px 12px;min-width:150px;flex:1 1 150px}
+.step b{display:block;font-size:13px}
+.step span{font-size:12.5px;color:var(--muted)}
+.arrow{align-self:center;color:var(--muted);font-weight:700}
+.states{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}
+.st{padding:3px 10px;border-radius:6px;font-size:12.5px;font-weight:600;border:1px solid var(--line);background:var(--surface-2)}
+.st.green{border-color:var(--ok);color:var(--ok)} .st.red{border-color:var(--bad);color:var(--bad)}
+.st.amber{border-color:var(--warn);color:var(--warn)} .st.blue{border-color:var(--fk);color:var(--fk)} .st.gray{color:var(--muted)}
+.search{font:inherit;padding:7px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--text);min-width:260px;max-width:100%}
+.count{color:var(--muted);font-size:13px}
+.tick{color:var(--ok);font-weight:700}
+footer{color:var(--muted);font-size:12.5px;padding:0 16px 30px}
+@media (max-width:640px){ .grid{grid-template-columns:1fr} .search{min-width:0;width:100%} }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Hệ thống quản lý khách sạn: cơ sở dữ liệu và nghiệp vụ</h1>
+    <p class="sub">Database <code>HotelManagement</code> (SQL Server) – lập từ <code>database/01_HotelManagement_TaoDB.sql</code> và <code>docs/Tai_lieu_nghiep_vu.md</code>. 14 bảng, 23 khóa ngoại, 14 view, 6 function, 27 procedure (4 nội bộ + 23 gọi từ form), 1 kiểu bảng.</p>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-erd" aria-controls="p-erd" aria-selected="true">1. Sơ đồ thực thể quan hệ</button>
+      <button class="tab" role="tab" id="tab-obj" aria-controls="p-obj" aria-selected="false">2. View, function, procedure</button>
+      <button class="tab" role="tab" id="tab-biz" aria-controls="p-biz" aria-selected="false">3. Nghiệp vụ</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ===================================================== TAB 1: ERD ===================================================== -->
+<section id="p-erd" role="tabpanel" aria-labelledby="tab-erd">
+  <h2>Sơ đồ thực thể quan hệ (ERD)</h2>
+  <p class="muted">Mỗi đường nối khóa ngoại (cột <b style="color:var(--fk)">FK</b> ở bảng con) với khóa chính (cột <b style="color:var(--pk)">PK</b> ở bảng cha), đầu đường chạm đúng dòng cột đó. Rê chuột vào một bảng để làm nổi các quan hệ của bảng đó.</p>
+
+  <div class="card" style="margin-bottom:12px">
+    <div class="legend-row">
+      <span><svg width="70" height="20"><line x1="2" y1="10" x2="68" y2="10" stroke="var(--edge)" stroke-width="1.4"/><line x1="8" y1="4" x2="8" y2="16" stroke="var(--edge)" stroke-width="1.4"/><line x1="12" y1="4" x2="12" y2="16" stroke="var(--edge)" stroke-width="1.4"/><line x1="56" y1="10" x2="68" y2="4" stroke="var(--edge)" stroke-width="1.4"/><line x1="56" y1="10" x2="68" y2="16" stroke="var(--edge)" stroke-width="1.4"/><circle cx="51" cy="10" r="3.5" fill="var(--surface)" stroke="var(--edge)" stroke-width="1.4"/></svg> 1 – n (một bảng cha có 0..n bảng con; FK bắt buộc)</span>
+      <span><svg width="70" height="20"><line x1="2" y1="10" x2="68" y2="10" stroke="var(--edge)" stroke-width="1.4"/><line x1="8" y1="4" x2="8" y2="16" stroke="var(--edge)" stroke-width="1.4"/><circle cx="15" cy="10" r="3.5" fill="var(--surface)" stroke="var(--edge)" stroke-width="1.4"/><line x1="56" y1="10" x2="68" y2="4" stroke="var(--edge)" stroke-width="1.4"/><line x1="56" y1="10" x2="68" y2="16" stroke="var(--edge)" stroke-width="1.4"/><circle cx="51" cy="10" r="3.5" fill="var(--surface)" stroke="var(--edge)" stroke-width="1.4"/></svg> 0..1 – n (FK cho phép NULL)</span>
+      <span><svg width="70" height="20"><line x1="2" y1="10" x2="68" y2="10" stroke="var(--edge)" stroke-width="1.4"/><line x1="8" y1="4" x2="8" y2="16" stroke="var(--edge)" stroke-width="1.4"/><line x1="12" y1="4" x2="12" y2="16" stroke="var(--edge)" stroke-width="1.4"/><line x1="62" y1="4" x2="62" y2="16" stroke="var(--edge)" stroke-width="1.4"/><circle cx="55" cy="10" r="3.5" fill="var(--surface)" stroke="var(--edge)" stroke-width="1.4"/></svg> 1 – 0..1 (một – một, phía con có thể không có)</span>
+      <span><svg width="70" height="20"><line x1="2" y1="10" x2="68" y2="10" stroke="var(--edge-audit)" stroke-width="1.4" stroke-dasharray="5 4"/></svg> nhân viên thực hiện (bật bằng ô bên dưới)</span>
+      <span><b style="color:var(--pk)">PK</b> khóa chính · <b style="color:var(--fk)">FK</b> khóa ngoại · <b style="color:var(--uq)">UQ</b> duy nhất · <b style="color:var(--muted)">CC</b> cột tính toán</span>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <label><input type="checkbox" id="chkAudit"> Hiện 8 quan hệ "nhân viên thực hiện" (CreatedBy, CheckInBy, IssuedBy...)</label>
+    <button class="small" id="zoomOut" type="button">Thu nhỏ</button>
+    <button class="small" id="zoomFit" type="button">Vừa khung</button>
+    <button class="small" id="zoomIn" type="button">Phóng to</button>
+  </div>
+  <div class="erd-box" id="erdBox"><svg id="erd" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sơ đồ thực thể quan hệ 14 bảng"></svg></div>
+
+  <h2>Bảng liệt kê 23 quan hệ</h2>
+  <p class="muted">Cột "Kiểu" ghi theo khóa ngoại thật trong DB. Một số quan hệ vật lý là 1–n nhưng nghiệp vụ giới hạn thành 1–0..1 bằng index lọc duy nhất hoặc bằng procedure; các dòng đó ghi rõ ở cột "Ghi chú".</p>
+  <div class="scroll-x"><table class="data" id="relTable">
+    <thead><tr><th>#</th><th>Bảng cha (phía 1)</th><th>Bảng con (phía n)</th><th>Khóa ngoại</th><th>Kiểu</th><th>FK bắt buộc</th><th>Ý nghĩa / ghi chú</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+
+  <h2>Quan hệ n – n</h2>
+  <div class="card"><b>RoomTypes ⟷ Amenities</b> qua bảng nối <code>RoomTypeAmenities</code> (khóa chính ghép <code>RoomTypeId + AmenityId</code>): một loại phòng có nhiều tiện nghi, một tiện nghi gán cho nhiều loại phòng. Khóa ngoại không cascade, nên không xóa được tiện nghi đang được gán (form Loại phòng lưu danh sách tiện nghi trong một transaction: xóa hết rồi chèn lại).</div>
+</section>
+
+<!-- ===================================================== TAB 2: OBJECTS ===================================================== -->
+<section id="p-obj" role="tabpanel" aria-labelledby="tab-obj" hidden>
+  <h2>View, function, procedure và các đối tượng khác</h2>
+  <div class="toolbar">
+    <input class="search" id="objSearch" type="search" placeholder="Tìm theo tên, tác dụng hoặc tên form...">
+    <span class="count" id="objCount"></span>
+  </div>
+
+  <h3>View (14) – chỉ đọc, dùng cho lưới và báo cáo</h3>
+  <div class="scroll-x"><table class="data obj"><thead><tr><th>Tên</th><th>Nội dung trả về</th><th>Tác dụng</th><th>Dùng ở</th></tr></thead><tbody>
+    <tr><td class="name">vw_RoomStays</td><td>Mỗi lượt lưu trú (BookingRooms) kèm phiếu, người đặt, người ở thực tế, phòng, loại phòng, StayStatus, giờ nhận/trả thực tế, người check-in/out</td><td>View nền: các view lưu trú khác và hầu hết form đặt phòng/lưu trú đọc từ đây</td><td>frmBookings, frmBookingEdit, dlgCheckIn, dlgCancel, dlgExtendStay, frmCheckOut, frmServiceUsage, dlgPayment</td></tr>
+    <tr><td class="name">vw_RoomStayFolio</td><td>Sổ tiền từng lượt: tiền phòng dự kiến, tiền dịch vụ, cọc yêu cầu, đã cọc, thanh toán khác, đã hoàn, thực thu, tạm tính có VAT 10%, còn lại, có hóa đơn hiệu lực hay không</td><td>Biết phòng còn thiếu bao nhiêu, đủ cọc chưa, có bị khóa dịch vụ không</td><td>frmFrontDesk, dlgCheckIn, dlgPayment, dlgCancel, frmBookings, frmBookingEdit, frmServiceUsage; sp_RefreshBookingStatus</td></tr>
+    <tr><td class="name">vw_BookingSummary</td><td>Mỗi phiếu: khách, người tạo, số phòng theo trạng thái, ngày nhận sớm nhất / trả muộn nhất, cọc yêu cầu, đã thu, còn thiếu cọc, đủ cọc chưa</td><td>Danh sách phiếu đặt và lịch sử của khách</td><td>frmBookings, frmBookingEdit, frmCustomers (lịch sử), dlgPayment (thu cọc)</td></tr>
+    <tr><td class="name">vw_BookingStatement</td><td>Mỗi phiếu: số hóa đơn Paid, tổng tiền phòng, dịch vụ, giảm giá, thuế, tổng cộng</td><td>Bảng kê đối chiếu cả phiếu (không phải hóa đơn)</td><td>Tra cứu / đối chiếu</td></tr>
+    <tr><td class="name">vw_InvoiceDetail</td><td>Đầu hóa đơn: số HĐ, trạng thái, người lập, khách, phòng, ngày nhận/trả, tiền phòng, dịch vụ, giảm giá, thuế, tổng, người mua, thông tin void, ReplacesInvoiceId, thực thu của phòng</td><td>Danh sách và in hóa đơn</td><td>frmInvoices, frmInvoicePrint, dlgReissueInvoice; sp_CheckOutRoom và sp_ReissueInvoice trả về</td></tr>
+    <tr><td class="name">vw_InvoiceLines</td><td>Dòng in: dòng 1 là tiền phòng (số đêm × giá), các dòng sau là từng dịch vụ (kể cả phụ thu trả trễ)</td><td>Phần bảng chi tiết của hóa đơn</td><td>frmInvoices, frmInvoicePrint</td></tr>
+    <tr><td class="name">vw_RoomBoard</td><td>Mỗi phòng: tầng, loại, trạng thái, khách đang ở và ngày trả dự kiến, khách đến hôm nay</td><td>Sơ đồ phòng tô màu trên màn hình chính</td><td>frmMain</td></tr>
+    <tr><td class="name">vw_TodayArrivals</td><td>Lượt Booked có ngày nhận = hôm nay</td><td>Tab "Khách đến hôm nay"</td><td>frmFrontDesk</td></tr>
+    <tr><td class="name">vw_InHouseStays</td><td>Lượt CheckedIn</td><td>Tab "Đang ở"</td><td>frmFrontDesk</td></tr>
+    <tr><td class="name">vw_TodayDepartures</td><td>Lượt CheckedIn có ngày trả ≤ hôm nay (gồm cả quá hạn chưa trả)</td><td>Tab "Dự kiến trả hôm nay"</td><td>frmFrontDesk</td></tr>
+    <tr><td class="name">vw_PaymentLedger</td><td>Mỗi khoản tiền: thời điểm, loại, phương thức, số tiền, số có dấu, mã GD, phòng, phiếu, khách, số hóa đơn, người thu</td><td>Sổ thu, tính thực thu</td><td>frmPaymentLedger</td></tr>
+    <tr><td class="name">vw_ServiceUsageStats</td><td>Theo dịch vụ và ngày dùng: số lượt, tổng số lượng, tổng tiền</td><td>Báo cáo dịch vụ</td><td>frmReports (tab Dịch vụ)</td></tr>
+    <tr><td class="name">vw_HousekeepingQueue</td><td>Việc dọn chưa xong: phòng, tầng, loại, trạng thái phòng, nguồn, trạng thái việc, người nhận, số phút đã chờ</td><td>Hàng đợi dọn phòng</td><td>frmHousekeeping, frmMain (đếm việc)</td></tr>
+    <tr><td class="name">vw_RoomStatusSummary</td><td>1 dòng: tổng phòng đang khai thác, số phòng Available / Occupied / Cleaning / Maintenance</td><td>Chỉ số phòng</td><td>sp_DashboardSummary, frmReports (tab Phòng)</td></tr>
+  </tbody></table></div>
+
+  <h3>Function (6)</h3>
+  <div class="scroll-x"><table class="data obj"><thead><tr><th>Tên</th><th>Tham số → trả về</th><th>Tác dụng</th><th>Dùng ở</th></tr></thead><tbody>
+    <tr><td class="name">fn_HasRole</td><td><code>@EmployeeId, @Roles</code> → BIT</td><td>Nhân viên đang hoạt động có thuộc một trong các vai trò liệt kê không. Mọi procedure ghi dữ liệu gọi hàm này để chặn quyền (lỗi 50001)</td><td>Hầu hết procedure</td></tr>
+    <tr><td class="name">fn_LateCheckoutFee</td><td><code>@PricePerNight, @CheckOutDate, @ActualCheckOut</code> → DECIMAL</td><td>Phụ thu trả phòng trễ so với 12:00 ngày trả. Trả NULL khi trễ quá 360 phút (sau 18:00): bắt buộc gia hạn</td><td>fn_CheckOutQuote</td></tr>
+    <tr><td class="name">fn_StayNetPaid</td><td><code>@BookingRoomId</code> → DECIMAL</td><td>Tiền thực đã thu của một lượt = tổng cọc + thanh toán − hoàn</td><td>sp_CheckInRoom, sp_CancelBookingRoom, usp_SettleStay, dlgReissueInvoice</td></tr>
+    <tr><td class="name">fn_RequiredDeposit</td><td><code>@BookingRoomId</code> → DECIMAL</td><td>Cọc yêu cầu của một lượt = ROUND(giá × số đêm × tỷ lệ cọc)</td><td>sp_CheckInRoom</td></tr>
+    <tr><td class="name">fn_AvailableRooms</td><td><code>@CheckIn, @CheckOut, @ExcludeBookingRoomId</code> → bảng</td><td>Phòng trống trong khoảng [nhận, trả): đang khai thác, loại đang dùng, không bảo trì, không trùng lượt Booked/CheckedIn. Tham số Exclude để khi đổi phòng không tự trùng với chính lượt đó</td><td>frmBookingEdit</td></tr>
+    <tr><td class="name">fn_CheckOutQuote</td><td><code>@BookingRoomId, @CheckOutAt, @Discount, @TaxRate</code> → bảng 1 dòng</td><td>Bảng tính check-out: số đêm, tiền phòng, dịch vụ, số phút trễ, phụ thu, MustExtend, tổng (cùng công thức cột Invoices.TotalAmount), đã thu, còn lại</td><td>sp_PreviewCheckOut, sp_CheckOutRoom</td></tr>
+  </tbody></table></div>
+
+  <h3>Procedure (27 = 4 nội bộ + 23 gọi từ form)</h3>
+  <p class="muted">Cột "Quyền": A = Admin, M = Manager, R = Receptionist, H = Housekeeping (kiểm tra bằng <code>fn_HasRole</code> qua tham số <code>@EmployeeId</code>). Procedure ghi nhiều bảng tự mở transaction (chỉ khi chưa có transaction bên ngoài) và rollback khi lỗi.</p>
+  <div class="scroll-x"><table class="data obj"><thead><tr><th>Nhóm</th><th>Tên</th><th>Tham số chính</th><th>Tác dụng</th><th>Quyền</th><th>Gọi từ</th></tr></thead><tbody>
+    <tr><td>Nội bộ</td><td class="name">sp_RefreshBookingStatus</td><td><code>@BookingId</code></td><td>Tính lại trạng thái phiếu từ trạng thái các phòng và tiền cọc (Pending / Confirmed / CheckedIn / CheckedOut / Cancelled), ghi ConfirmedAt, CancelledAt</td><td>–</td><td>Các procedure đặt phòng, check-in/out</td></tr>
+    <tr><td>Nội bộ</td><td class="name">usp_CheckServiceEditable</td><td><code>@BookingRoomId, @EmployeeId, @UsedAt</code></td><td>Có được thêm/sửa/xóa dịch vụ không: đang ở → A/M/R, thời điểm trong thời gian ở; đã trả → chỉ A/M và chỉ khi hóa đơn đã void</td><td>–</td><td>sp_Add/Update/DeleteServiceUsage</td></tr>
+    <tr><td>Nội bộ</td><td class="name">usp_CheckDiscount</td><td><code>@Discount, @DiscountReason, @SubTotal, @TaxRate, @EmployeeId</code></td><td>Giảm giá không âm, không vượt tổng, phải có lý do, trên 10% phải là A/M; thuế 0–100</td><td>–</td><td>sp_CheckOutRoom, sp_ReissueInvoice</td></tr>
+    <tr><td>Nội bộ</td><td class="name">usp_SettleStay</td><td><code>@BookingRoomId, @InvoiceId, @PayAmount, @PayMethod, @RefundMethod...</code></td><td>Chốt tiền khi lập hóa đơn: thu thêm phần thiếu (không thu vượt), chặn nếu còn thiếu, ghi hoàn nếu khách trả dư, gắn mọi khoản thu vào hóa đơn</td><td>–</td><td>sp_CheckOutRoom, sp_ReissueInvoice</td></tr>
+    <tr><td>Đăng nhập</td><td class="name">sp_GetEmployeeForLogin</td><td><code>@Username</code></td><td>Trả EmployeeId, họ tên, PasswordHash, IsActive, vai trò để C# so mật khẩu BCrypt (không so mật khẩu trong SQL)</td><td>–</td><td>frmLogin (Session.TryLogin)</td></tr>
+    <tr><td>Đặt phòng</td><td class="name">sp_CreateBooking</td><td><code>@CustomerId, @DepositRate, @Note, @Rooms (BookingRoomInput), @BookingId OUT</code></td><td>Tạo phiếu nhiều phòng trong một transaction: kiểm tra ngày, sức chứa, phòng bảo trì, trùng lịch (khóa UPDLOCK), chốt giá theo BasePrice; phiếu mới là Pending</td><td>A, M, R</td><td>frmBookingEdit</td></tr>
+    <tr><td>Đặt phòng</td><td class="name">sp_UpdateBookingRoom</td><td><code>@BookingRoomId, @NewRoomId, @CheckInDate, @CheckOutDate, @Adults, @Children, @KeepPrice, @Reason</code></td><td>Sửa lượt chưa nhận: đổi ngày, phòng, số khách. Đổi sang loại khác thì lấy giá mới; KeepPrice = 1 (khách sạn đổi phòng) giữ giá cũ, chỉ khi phòng mới cùng hạng trở lên và có lý do</td><td>A, M, R</td><td>frmBookingEdit</td></tr>
+    <tr><td>Đặt phòng</td><td class="name">sp_CancelBookingRoom</td><td><code>@BookingRoomId, @Reason, @IsNoShow, @RefundMethod, @RefundReference, @RefundAmount OUT</code></td><td>Hủy một phòng chưa nhận. Hủy trước 14:00 ngày nhận ≥ 48 giờ: hoàn 100% đã thu; muộn hơn hoặc no-show: không hoàn. No-show chỉ sau 12:00 ngày hôm sau ngày nhận</td><td>A, M, R</td><td>dlgCancel</td></tr>
+    <tr><td>Đặt phòng</td><td class="name">sp_CancelBooking</td><td><code>@BookingId, @Reason, @RefundMethod, @RefundReference, @TotalRefund OUT</code></td><td>Hủy mọi phòng còn Booked của phiếu (gọi sp_CancelBookingRoom cho từng phòng). Không cho hủy khi phiếu có phòng đang ở</td><td>A, M, R</td><td>dlgCancel</td></tr>
+    <tr><td>Đặt phòng</td><td class="name">sp_ExpirePendingBookings</td><td>(không)</td><td>Hủy phiếu Pending chưa từng xác nhận, tạo quá 24 giờ. Trả về các phiếu vừa hủy mà đã có tiền thu để nhân viên hoàn thủ công (SQL Express không có SQL Agent nên app tự gọi)</td><td>–</td><td>frmMain (lúc mở), frmBookings</td></tr>
+    <tr><td>Thu tiền</td><td class="name">sp_RecordBookingDeposit</td><td><code>@BookingId, @Amount, @Method, @ReferenceNo</code></td><td>Thu cọc cho cả phiếu: lần lượt bù cọc còn thiếu của từng phòng, dư thì bù tiếp vào tiền phòng; không vượt tiền phòng còn lại; chuyển khoản/ví phải có mã GD</td><td>A, M, R</td><td>dlgPayment (Deposit)</td></tr>
+    <tr><td>Thu tiền</td><td class="name">sp_RecordPayment</td><td><code>@BookingRoomId, @Type, @Amount, @Method, @ReferenceNo, @Note, @PaymentId OUT</code></td><td>Ghi một khoản cho một lượt: Deposit (phòng Booked), Payment (phòng đang ở; A/M ghi điều chỉnh trạng thái khác phải có ghi chú), Refund (chỉ A/M, bắt buộc ghi chú, không vượt số đã thu)</td><td>A, M, R (Refund: A, M)</td><td>dlgPayment (StayPayment, Refund)</td></tr>
+    <tr><td>Lưu trú</td><td class="name">sp_CheckInRoom</td><td><code>@BookingRoomId, @GuestName, @GuestIdNumber</code></td><td>Nhận phòng: phiếu Confirmed, đủ cọc của phòng, đúng ngày (từ ngày nhận đến trước ngày trả), phòng Available. Ghi người ở, giờ nhận; phòng → Occupied; tính lại phiếu</td><td>A, M, R</td><td>dlgCheckIn</td></tr>
+    <tr><td>Lưu trú</td><td class="name">sp_AddServiceUsage</td><td><code>@BookingRoomId, @ServiceId, @Quantity, @UsedAt, @Note, @UsageId OUT</code></td><td>Ghi dịch vụ với đơn giá hiện tại của dịch vụ; không cho dịch vụ hệ thống hoặc ngừng bán</td><td>A, M, R</td><td>frmServiceUsage</td></tr>
+    <tr><td>Lưu trú</td><td class="name">sp_UpdateServiceUsage</td><td><code>@UsageId, @Quantity, @UsedAt, @Note</code></td><td>Sửa số lượng, thời điểm, ghi chú một dòng dịch vụ (theo quy tắc usp_CheckServiceEditable)</td><td>A, M, R</td><td>frmServiceUsage</td></tr>
+    <tr><td>Lưu trú</td><td class="name">sp_DeleteServiceUsage</td><td><code>@UsageId</code></td><td>Xóa một dòng dịch vụ (theo quy tắc usp_CheckServiceEditable)</td><td>A, M, R</td><td>frmServiceUsage</td></tr>
+    <tr><td>Lưu trú</td><td class="name">sp_ExtendStay</td><td><code>@BookingRoomId, @NewCheckOutDate, @Reason</code></td><td>Gia hạn phòng đang ở: ngày mới phải sau ngày cũ, các đêm thêm không trùng lịch khách khác (50005); ghi nhật ký vào Note</td><td>A, M, R</td><td>dlgExtendStay</td></tr>
+    <tr><td>Check-out</td><td class="name">sp_PreviewCheckOut</td><td><code>@BookingRoomId, @CheckOutAt, @Discount, @TaxRate</code></td><td>Xem trước bảng tính (không ghi dữ liệu). Cột đầu CheckOutAt phải giữ lại để truyền nguyên vào sp_CheckOutRoom</td><td>–</td><td>frmCheckOut</td></tr>
+    <tr><td>Check-out</td><td class="name">sp_CheckOutRoom</td><td><code>@BookingRoomId, @CheckOutAt, @Discount, @DiscountReason, @TaxRate, người mua, thu/hoàn, @InvoiceId OUT</code></td><td>Trả phòng: bảng tính còn hiệu lực 10 phút, chặn sau 18:00, kiểm tra giảm giá, ghi phụ thu trễ thành dịch vụ hệ thống, lập hóa đơn Paid, chốt tiền, phòng → Cleaning, tạo việc dọn, tính lại phiếu</td><td>A, M, R</td><td>frmCheckOut</td></tr>
+    <tr><td>Hóa đơn</td><td class="name">sp_VoidInvoice</td><td><code>@InvoiceId, @Reason</code></td><td>Hủy (void) hóa đơn Paid, bắt buộc lý do; không đụng tới tiền đã thu</td><td>A, M</td><td>frmInvoices</td></tr>
+    <tr><td>Hóa đơn</td><td class="name">sp_ReissueInvoice</td><td>Như sp_CheckOutRoom nhưng không có @CheckOutAt</td><td>Lập lại hóa đơn cho phòng đã trả có hóa đơn void gần nhất: tính lại từ dữ liệu hiện tại (không tính lại phụ thu), thu thêm hoặc hoàn chênh lệch, gắn ReplacesInvoiceId</td><td>A, M</td><td>dlgReissueInvoice</td></tr>
+    <tr><td>Phòng</td><td class="name">sp_SetRoomMaintenance</td><td><code>@RoomId, @Note</code></td><td>Đưa phòng Available vào bảo trì (bắt buộc ghi chú). Trả về các lượt đã đặt sắp tới của phòng để lễ tân đổi phòng</td><td>A, M</td><td>frmRooms</td></tr>
+    <tr><td>Phòng</td><td class="name">sp_FinishMaintenance</td><td><code>@RoomId, @Note</code></td><td>Kết thúc bảo trì: Maintenance → Cleaning, tạo việc dọn nguồn AfterMaintenance</td><td>A, M</td><td>frmRooms</td></tr>
+    <tr><td>Dọn phòng</td><td class="name">sp_StartHousekeepingTask</td><td><code>@TaskId</code></td><td>Nhận việc: Pending → InProgress, ghi người nhận và giờ bắt đầu</td><td>H, A, M</td><td>frmHousekeeping</td></tr>
+    <tr><td>Dọn phòng</td><td class="name">sp_CompleteHousekeepingTask</td><td><code>@TaskId, @Result, @Note</code></td><td>Hoàn tất: Clean → phòng Available; NeedMaintenance (bắt buộc ghi chú) → phòng Maintenance. Việc người khác đang làm chỉ A/M hoàn tất thay</td><td>H, A, M</td><td>frmHousekeeping</td></tr>
+    <tr><td>Báo cáo</td><td class="name">sp_DashboardSummary</td><td><code>@Date</code></td><td>Chỉ số trong ngày: phòng theo trạng thái, khách đến, đang ở, dự kiến trả, đã nhận/đã trả hôm nay, phiếu mới, công suất; doanh thu hôm nay chỉ trả cho A/M</td><td>A, M, R</td><td>frmMain</td></tr>
+    <tr><td>Báo cáo</td><td class="name">sp_RevenueReport</td><td><code>@FromDate, @ToDate, @GroupBy (DAY|MONTH)</code></td><td>Trả 2 bảng: (1) thực thu theo ngày nhận tiền, chia theo loại và phương thức; (2) doanh số theo ngày lập hóa đơn Paid</td><td>A, M</td><td>frmReports</td></tr>
+  </tbody></table></div>
+
+  <h3>Kiểu bảng (table type)</h3>
+  <div class="scroll-x"><table class="data obj"><thead><tr><th>Tên</th><th>Cột</th><th>Tác dụng</th><th>Dùng ở</th></tr></thead><tbody>
+    <tr><td class="name">dbo.BookingRoomInput</td><td>RoomId, CheckInDate, CheckOutDate, Adults, Children, GuestName, GuestIdNumber</td><td>Truyền nhiều phòng cùng lúc vào sp_CreateBooking (tham số bảng, READONLY). C# tạo bằng <code>DbHelper.CreateBookingRoomInput()</code>, đúng thứ tự cột</td><td>frmBookingEdit</td></tr>
+  </tbody></table></div>
+
+  <h3>Ràng buộc và cột tính toán đáng chú ý</h3>
+  <div class="scroll-x"><table class="data obj"><thead><tr><th>Đối tượng</th><th>Định nghĩa</th><th>Tác dụng</th></tr></thead><tbody>
+    <tr><td class="name">UX_Invoices_ActivePerStay</td><td>UNIQUE (BookingRoomId) WHERE Status = 'Paid'</td><td>Mỗi lượt lưu trú tối đa 1 hóa đơn hiệu lực (quan hệ BookingRooms – Invoices hiệu lực là 1 – 0..1)</td></tr>
+    <tr><td class="name">UX_HousekeepingTasks_OpenTask</td><td>UNIQUE (RoomId) WHERE Status &lt;&gt; 'Done'</td><td>Mỗi phòng tối đa 1 việc dọn đang mở</td></tr>
+    <tr><td class="name">IX_BookingRooms_Room_Dates</td><td>INDEX (RoomId, CheckInDate, CheckOutDate) WHERE Status IN ('Booked','CheckedIn')</td><td>Tìm trùng lịch nhanh; lượt đã hủy không chiếm lịch</td></tr>
+    <tr><td class="name">BookingRooms.Nights</td><td>DATEDIFF(DAY, CheckInDate, CheckOutDate), PERSISTED</td><td>Số đêm luôn khớp ngày nhận/trả</td></tr>
+    <tr><td class="name">ServiceUsages.Amount</td><td>Quantity × UnitPrice</td><td>Thành tiền dòng dịch vụ (đơn giá lưu tại thời điểm dùng)</td></tr>
+    <tr><td class="name">Invoices.TotalAmount</td><td>ROUND((RoomCharge + ServiceCharge − Discount) × (1 + TaxRate/100), 0)</td><td>Tổng hóa đơn, cùng công thức với fn_CheckOutQuote</td></tr>
+    <tr><td class="name">Invoices.InvoiceNo</td><td>'HD' + 6 chữ số của InvoiceId</td><td>Số hóa đơn HD000001...</td></tr>
+    <tr><td class="name">Payments.SignedAmount</td><td>−Amount nếu Type = Refund, ngược lại +Amount</td><td>Cộng thẳng ra thực thu</td></tr>
+    <tr><td class="name">CK_BookingRooms_StatusData</td><td>Booked: chưa có giờ nhận/trả; CheckedIn: có giờ nhận; CheckedOut: giờ trả &gt; giờ nhận; Cancelled: có CancelledAt</td><td>Dữ liệu luôn khớp trạng thái</td></tr>
+    <tr><td class="name">CK_Invoices_*</td><td>Discount ≤ RoomCharge + ServiceCharge; có giảm giá phải có lý do; có MST phải có tên đơn vị; Void phải có VoidedAt, VoidedBy, VoidReason</td><td>Chặn hóa đơn sai ngay ở DB</td></tr>
+    <tr><td class="name">CK_Payments_Reference</td><td>BankTransfer / EWallet thì ReferenceNo NOT NULL</td><td>Bắt buộc mã giao dịch</td></tr>
+    <tr><td class="name">Mã lỗi THROW</td><td>50001 quyền · 50002 không tìm thấy · 50003 sai trạng thái · 50004 dữ liệu không hợp lệ · 50005 trùng lịch · 50006 tiền · 50007 ngày giờ</td><td>C# (ErrorHandler) hiện nguyên câu tiếng Việt của procedure</td></tr>
+  </tbody></table></div>
+</section>
+
+<!-- ===================================================== TAB 3: BUSINESS ===================================================== -->
+<section id="p-biz" role="tabpanel" aria-labelledby="tab-biz" hidden>
+  <h2>Luồng nghiệp vụ tổng thể</h2>
+  <p class="muted">Đơn vị trung tâm là <b>lượt lưu trú của từng phòng</b> (BookingRooms). Check-in, dịch vụ, gia hạn, check-out, hóa đơn và thanh toán đều theo từng phòng; phiếu đặt chỉ gom các phòng của một khách, trạng thái phiếu do DB tự tính.</p>
+  <div class="flow">
+    <div class="step"><b>1. Khách hàng</b><span>Tạo hồ sơ (CCCD duy nhất)</span></div><div class="arrow">→</div>
+    <div class="step"><b>2. Đặt phòng</b><span>Phiếu Pending, giá chốt theo loại phòng</span></div><div class="arrow">→</div>
+    <div class="step"><b>3. Thu cọc</b><span>Đủ cọc 50% / 100% → Confirmed</span></div><div class="arrow">→</div>
+    <div class="step"><b>4. Check-in</b><span>Phòng → Occupied, ghi người ở</span></div><div class="arrow">→</div>
+    <div class="step"><b>5. Lưu trú</b><span>Ghi dịch vụ, thu tiền, gia hạn</span></div><div class="arrow">→</div>
+    <div class="step"><b>6. Check-out</b><span>Phụ thu trễ, giảm giá, VAT, hóa đơn Paid, thu đủ / hoàn dư</span></div><div class="arrow">→</div>
+    <div class="step"><b>7. Dọn phòng</b><span>Cleaning → Available (hoặc Bảo trì)</span></div>
+  </div>
+  <p class="muted" style="margin-top:8px">Nhánh phụ: hủy phòng / hủy phiếu / no-show; phiếu chờ cọc quá 24 giờ tự hủy; void hóa đơn → sửa dịch vụ → lập lại hóa đơn; bảo trì phòng.</p>
+
+  <h2>Vai trò và ma trận quyền</h2>
+  <div class="scroll-x"><table class="data">
+    <thead><tr><th>Chức năng</th><th>Admin</th><th>Manager</th><th>Receptionist</th><th>Housekeeping</th></tr></thead>
+    <tbody>
+      <tr><td>Đăng nhập, đổi mật khẩu của mình</td><td class="tick">✓</td><td class="tick">✓</td><td class="tick">✓</td><td class="tick">✓</td></tr>
+      <tr><td>Vai trò: xem, sửa mô tả</td><td class="tick">✓</td><td></td><td></td><td></td></tr>
+      <tr><td>Nhân viên: tạo, sửa, khóa/mở, đặt lại mật khẩu</td><td class="tick">✓</td><td></td><td></td><td></td></tr>
+      <tr><td>Khách hàng: thêm, sửa</td><td class="tick">✓</td><td class="tick">✓</td><td class="tick">✓</td><td></td></tr>
+      <tr><td>Khách hàng: xóa (khi chưa có phiếu)</td><td class="tick">✓</td><td class="tick">✓</td><td></td><td></td></tr>
+      <tr><td>Danh mục loại phòng, phòng, tiện nghi, dịch vụ</td><td class="tick">✓</td><td class="tick">✓</td><td class="muted">xem</td><td></td></tr>
+      <tr><td>Đưa phòng vào / ra bảo trì</td><td class="tick">✓</td><td class="tick">✓</td><td></td><td></td></tr>
+      <tr><td>Đặt, sửa, hủy phòng; no-show</td><td class="tick">✓</td><td class="tick">✓</td><td class="tick">✓</td><td></td></tr>
+      <tr><td>Thu cọc, thu tiền, hoàn theo chính sách</td><td class="tick">✓</td><td class="tick">✓</td><td class="tick">✓</td><td></td></tr>
+      <tr><td>Hoàn tiền ngoài chính sách (bút toán ngược)</td><td class="tick">✓</td><td class="tick">✓</td><td></td><td></td></tr>
+      <tr><td>Check-in, đổi phòng trước check-in, gia hạn, check-out</td><td class="tick">✓</td><td class="tick">✓</td><td class="tick">✓</td><td></td></tr>
+      <tr><td>Ghi, sửa, xóa dịch vụ khi phòng đang ở</td><td class="tick">✓</td><td class="tick">✓</td><td class="tick">✓</td><td></td></tr>
+      <tr><td>Giảm giá đến 10%</td><td class="tick">✓</td><td class="tick">✓</td><td class="tick">✓</td><td></td></tr>
+      <tr><td>Giảm giá trên 10%</td><td class="tick">✓</td><td class="tick">✓</td><td></td><td></td></tr>
+      <tr><td>Void, lập lại hóa đơn; sửa dịch vụ sau void</td><td class="tick">✓</td><td class="tick">✓</td><td></td><td></td></tr>
+      <tr><td>Nhận và hoàn tất việc dọn phòng</td><td class="tick">✓</td><td class="tick">✓</td><td class="muted">xem</td><td class="tick">✓</td></tr>
+      <tr><td>Dashboard vận hành</td><td class="tick">✓</td><td class="tick">✓</td><td class="tick">✓ (không thấy doanh thu)</td><td class="muted">hàng đợi dọn phòng</td></tr>
+      <tr><td>Báo cáo doanh thu, sổ thu</td><td class="tick">✓</td><td class="tick">✓</td><td></td><td></td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted">Quyền được chặn ở 2 lớp: giao diện ẩn menu/nút và chặn mở form (<code>UiHelper.RequireRole</code>); procedure kiểm tra lại bằng <code>fn_HasRole</code>.</p>
+
+  <h2>Trạng thái và chuyển trạng thái</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Phòng (Rooms.Status)</h3>
+      <div class="states"><span class="st green">Available</span>→<span class="st red">Occupied</span>→<span class="st amber">Cleaning</span>→<span class="st green">Available</span></div>
+      <div class="states"><span class="st green">Available</span> / <span class="st amber">Cleaning</span>→<span class="st gray">Maintenance</span>→<span class="st amber">Cleaning</span></div>
+      <ul>
+        <li>Check-in: Available → Occupied (sp_CheckInRoom)</li>
+        <li>Check-out: Occupied → Cleaning + việc dọn (sp_CheckOutRoom)</li>
+        <li>Dọn xong Sạch → Available; báo hỏng → Maintenance (sp_CompleteHousekeepingTask)</li>
+        <li>Bảo trì chỉ từ Available (sp_SetRoomMaintenance); kết thúc → Cleaning + việc dọn (sp_FinishMaintenance)</li>
+        <li>Không có trạng thái Reserved: phòng "đã đặt" xét theo lịch BookingRooms. Không sửa Status bằng tay</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Lượt lưu trú (BookingRooms.Status)</h3>
+      <div class="states"><span class="st blue">Booked</span>→<span class="st red">CheckedIn</span>→<span class="st green">CheckedOut</span></div>
+      <div class="states"><span class="st blue">Booked</span>→<span class="st gray">Cancelled</span> <span class="muted">(hủy, no-show, hết hạn giữ chỗ)</span></div>
+      <ul>
+        <li>Chỉ sửa / hủy được lượt Booked</li>
+        <li>Chỉ gia hạn, ghi dịch vụ, thu tiền, check-out lượt CheckedIn</li>
+        <li>Sau CheckedOut: dịch vụ khóa trừ khi hóa đơn đã void (chỉ A/M)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Phiếu đặt (Bookings.Status) – DB tự tính</h3>
+      <div class="states"><span class="st amber">Pending</span>→<span class="st blue">Confirmed</span>→<span class="st red">CheckedIn</span>→<span class="st green">CheckedOut</span> · <span class="st gray">Cancelled</span></div>
+      <ul>
+        <li>Không còn phòng hiệu lực → Cancelled</li>
+        <li>Có phòng đang ở, hoặc vừa có phòng đã trả vừa có phòng chưa nhận → CheckedIn</li>
+        <li>Mọi phòng hiệu lực đã trả → CheckedOut</li>
+        <li>Còn lại: đủ cọc → Confirmed, thiếu cọc → Pending</li>
+        <li>Tính lại sau mỗi thao tác bằng sp_RefreshBookingStatus</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Hóa đơn (Invoices.Status)</h3>
+      <div class="states"><span class="st green">Paid</span>→<span class="st gray">Void</span> <span class="muted">→ lập lại: hóa đơn Paid mới (ReplacesInvoiceId = hóa đơn void)</span></div>
+      <ul>
+        <li>Chỉ 2 trạng thái; mỗi lượt tối đa 1 hóa đơn Paid</li>
+        <li>Void không hoàn tiền tự động; chênh lệch xử lý khi lập lại</li>
+        <li>Hóa đơn cũ vẫn giữ lại ở trạng thái Void để truy vết</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Việc dọn phòng (HousekeepingTasks)</h3>
+      <div class="states"><span class="st amber">Pending</span>→<span class="st blue">InProgress</span>→<span class="st green">Done</span> <span class="muted">(Result: Clean / NeedMaintenance)</span></div>
+      <ul>
+        <li>Sinh tự động khi check-out (CheckOut) hoặc kết thúc bảo trì (AfterMaintenance)</li>
+        <li>Mỗi phòng tối đa 1 việc đang mở</li>
+        <li>Có thể hoàn tất thẳng từ Pending (tự gán người làm)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Khoản tiền (Payments.Type)</h3>
+      <div class="states"><span class="st blue">Deposit</span><span class="st green">Payment</span><span class="st red">Refund</span></div>
+      <ul>
+        <li>Phương thức: Cash, Card, BankTransfer, EWallet; 2 loại sau bắt buộc mã giao dịch</li>
+        <li>Thực thu = Σ SignedAmount (Refund mang dấu âm)</li>
+        <li>Mọi khoản gắn với lượt lưu trú; khi lập hóa đơn được gắn thêm InvoiceId</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Quy tắc theo từng nghiệp vụ</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Đăng nhập và tài khoản</h3>
+      <ul>
+        <li>Mật khẩu băm BCrypt (work factor 11), không lưu mật khẩu thô, không hiện PasswordHash ở bất kỳ màn hình nào</li>
+        <li>Sai tên hoặc sai mật khẩu báo chung một câu; tài khoản khóa (IsActive = 0) báo riêng</li>
+        <li>Đổi mật khẩu: đúng mật khẩu cũ, mới ≥ 6 ký tự, khác mật khẩu cũ, nhập lại khớp</li>
+        <li>Đặt lại mật khẩu về 123456; không xóa cứng nhân viên, chỉ khóa</li>
+        <li>Không tự khóa mình; không khóa hoặc đổi vai trò Admin cuối cùng đang hoạt động</li>
+        <li>4 vai trò cố định, chỉ sửa mô tả</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Danh mục</h3>
+      <ul>
+        <li>Khách hàng: họ tên, CCCD/hộ chiếu (duy nhất), SĐT bắt buộc; ngày sinh không ở tương lai; quốc tịch mặc định Việt Nam; chỉ xóa khách chưa có phiếu</li>
+        <li>Loại phòng: tên duy nhất, giá &gt; 0, sức chứa 1–10; ngừng dùng thay cho xóa; đổi giá không ảnh hưởng phiếu đã đặt</li>
+        <li>Phòng: số phòng duy nhất; không sửa trạng thái bằng tay; chỉ ngừng khai thác khi không còn lượt Booked/CheckedIn</li>
+        <li>Dịch vụ: tên duy nhất, giá ≥ 0; ngừng bán thay cho xóa; "Phụ thu trả phòng trễ" là dịch vụ hệ thống, chỉ xem</li>
+        <li>Tiện nghi: chỉ xóa khi chưa gán cho loại phòng nào</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Đặt phòng</h3>
+      <ul>
+        <li>Phiếu có khách và ít nhất 1 phòng; ngày nhận từ hôm nay, ngày trả sau ngày nhận</li>
+        <li>Trùng lịch: lượt hiện có CheckIn &lt; ngày trả mới VÀ CheckOut &gt; ngày nhận mới (loại trừ Cancelled). Đặt nối tiếp đúng ngày trả của lượt trước là hợp lệ</li>
+        <li>Pending cũng giữ lịch để tránh hai khách cùng giữ một phòng</li>
+        <li>Số khách mỗi phòng không vượt sức chứa; không đặt phòng bảo trì hoặc ngừng khai thác</li>
+        <li>Giá/đêm chốt theo BasePrice lúc đặt và lưu vào từng lượt</li>
+        <li>Người ở thực tế (tên + CCCD) có thể khác người đặt; có CCCD thì phải có tên</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Cọc</h3>
+      <ul>
+        <li>Tỷ lệ cọc 50% hoặc 100%; cọc yêu cầu từng phòng = ROUND(giá × số đêm × tỷ lệ)</li>
+        <li>Thu cọc theo phiếu, DB tự chia: bù cọc thiếu của từng phòng, dư thì bù tiền phòng; không vượt tiền phòng còn lại</li>
+        <li>Đủ cọc → phiếu Confirmed; phiếu Pending chưa từng xác nhận, quá 24 giờ → tự hủy (lý do "Hết hạn giữ chỗ")</li>
+        <li>Phiếu tự hủy mà đã thu tiền: app nhắc nhân viên hoàn thủ công</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Hủy và no-show</h3>
+      <ul>
+        <li>Chỉ hủy lượt Booked; bắt buộc lý do (trừ no-show)</li>
+        <li>Hủy trước 14:00 ngày nhận ít nhất 48 giờ: hoàn 100% số đã thu (phải chọn cách hoàn)</li>
+        <li>Hủy muộn hơn: không hoàn, khách mất cọc</li>
+        <li>No-show chỉ đánh dấu sau 12:00 ngày hôm sau ngày nhận; không hoàn</li>
+        <li>Hủy cả phiếu: không được khi phiếu có phòng đang ở</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Check-in</h3>
+      <ul>
+        <li>Phiếu Confirmed (hoặc CheckedIn khi phòng khác cùng phiếu đã nhận)</li>
+        <li>Phòng đủ cọc của riêng phòng đó (thực thu ≥ cọc yêu cầu)</li>
+        <li>Từ 00:00 ngày nhận đến trước ngày trả; nhận sớm trước 14:00 miễn phí; khách đến trễ vẫn nhận, không giảm tiền đêm đã giữ</li>
+        <li>Phòng phải Available (đang dọn thì chờ; bảo trì / có khách thì đổi phòng)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Dịch vụ và gia hạn</h3>
+      <ul>
+        <li>Ghi dịch vụ cho phòng đang ở với đơn giá hiện tại; thời điểm dùng trong thời gian ở và không ở tương lai</li>
+        <li>Số lượng &gt; 20 thì form hỏi xác nhận</li>
+        <li>Phòng đã có hóa đơn Paid: dịch vụ khóa; sau void chỉ A/M sửa</li>
+        <li>Gia hạn: chỉ phòng đang ở; ngày trả mới sau ngày cũ; không trùng lịch khách khác; đêm thêm tính theo giá đã chốt</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Check-out và phụ thu trả trễ</h3>
+      <ul>
+        <li>Giờ trả chuẩn 12:00 ngày trả. Bảng tính lấy từ xem trước, hiệu lực 10 phút; phải truyền đúng CheckOutAt của bảng tính</li>
+        <li>Phụ thu ghi thành dịch vụ hệ thống "Phụ thu trả phòng trễ" và nằm trong hóa đơn</li>
+        <li>Sau 18:00 ngày trả: bắt buộc gia hạn thêm 1 đêm rồi mới check-out</li>
+        <li>Phải thu đủ 100%; khách trả dư phải chọn cách hoàn</li>
+        <li>Xong: hóa đơn Paid, phòng Cleaning, việc dọn mới, phiếu tính lại. Đoàn nhiều phòng trả riêng từng phòng, mỗi phòng một hóa đơn</li>
+      </ul>
+      <table class="data" style="margin-top:8px">
+        <thead><tr><th>Trễ so với 12:00</th><th>Phụ thu (% giá 1 đêm)</th><th>Ví dụ giá 550.000</th></tr></thead>
+        <tbody>
+          <tr><td>≤ 30 phút</td><td>0%</td><td>0</td></tr>
+          <tr><td>31–60 / 61–90 / 91–120 phút</td><td>5% / 10% / 15%</td><td>27.500 / 55.000 / 82.500</td></tr>
+          <tr><td>121–180 / 181–240 phút</td><td>30% / 45%</td><td>165.000 / 247.500</td></tr>
+          <tr><td>241–300 / 301–360 phút</td><td>60% / 75%</td><td>330.000 / 412.500</td></tr>
+          <tr><td>&gt; 360 phút (sau 18:00)</td><td colspan="2">Không check-out được, phải gia hạn 1 đêm</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Giảm giá, VAT, tổng hóa đơn</h3>
+      <ul>
+        <li>Tổng = ROUND((tiền phòng + dịch vụ − giảm giá) × (1 + VAT)), VAT mặc định 10%</li>
+        <li>Giảm giá ≥ 0, không vượt tiền phòng + dịch vụ, bắt buộc lý do</li>
+        <li>Lễ tân giảm tối đa 10% tổng trước giảm; trên 10% phải là Manager/Admin</li>
+        <li>Người mua tùy chọn; có mã số thuế thì phải có tên đơn vị</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Hóa đơn: void và lập lại</h3>
+      <ul>
+        <li>Void: chỉ A/M, bắt buộc lý do, không đổi tiền đã thu</li>
+        <li>Sửa sai sau khi lập: Void → sửa dịch vụ (A/M) → Lập lại</li>
+        <li>Lập lại: chỉ phòng đã trả, chưa có hóa đơn Paid, dựa trên hóa đơn void gần nhất; tính lại từ dữ liệu hiện tại (không tính lại phụ thu); thu thêm hoặc hoàn chênh lệch</li>
+        <li>Hóa đơn mới ghi ReplacesInvoiceId; bản in ghi "Thay thế hóa đơn HD..."; hóa đơn void in chữ "ĐÃ HỦY"</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Thanh toán ngoài check-out</h3>
+      <ul>
+        <li>Thu tiền khi đang ở: ghi Payment cho phòng, gợi ý số còn lại tạm tính</li>
+        <li>Hoàn thủ công (ngoài chính sách): chỉ A/M, bắt buộc lý do, không vượt số đã thu của phòng</li>
+        <li>Thu/hoàn lúc check-out và lập lại hóa đơn do procedure tự ghi</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Dọn phòng và bảo trì</h3>
+      <ul>
+        <li>Buồng phòng thấy việc của mình và việc chưa ai nhận; nhận việc → InProgress</li>
+        <li>Hoàn tất Sạch → phòng Trống; Cần bảo trì (bắt buộc mô tả) → phòng Bảo trì</li>
+        <li>Việc người khác đang làm: chỉ A/M hoàn tất thay; hai người cùng nhận thì người sau bị từ chối</li>
+        <li>Đưa phòng vào bảo trì: báo danh sách phiếu sắp tới cần đổi phòng</li>
+        <li>Hàng đợi tự làm mới mỗi 60 giây; lễ tân chỉ xem</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Dashboard và báo cáo</h3>
+      <ul>
+        <li><b>Thực thu</b> = cọc + thanh toán − hoàn, theo ngày nhận tiền (PaidAt), chia theo phương thức</li>
+        <li><b>Doanh số</b> = tổng hóa đơn Paid theo ngày lập (IssuedAt). Hai số khác nhau là bình thường</li>
+        <li>Lọc khoảng ngày: từ ≥ FromDate và &lt; ToDate + 1 ngày (không mất ngày cuối); từ ngày phải ≤ đến ngày</li>
+        <li>Công suất = phòng có khách / (phòng khai thác − phòng bảo trì); mẫu số 0 thì 0</li>
+        <li>Lễ tân không thấy doanh thu; buồng phòng chỉ thấy hàng đợi dọn phòng</li>
+        <li>Tìm kiếm tiếng Việt không dấu (COLLATE Vietnamese_CI_AI), có tham số, thoát ký tự đặc biệt</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Kịch bản kiểm thử xuyên suốt</h2>
+  <ol class="card" style="padding-left:34px">
+    <li>Lễ tân đăng nhập, thêm khách mới.</li>
+    <li>Đặt 2 phòng nhận hôm nay, cọc 50% → thu cọc → phiếu Confirmed.</li>
+    <li>Check-in cả 2 phòng; ghi dịch vụ riêng từng phòng; gia hạn phòng 2 thêm 1 đêm.</li>
+    <li>Check-out phòng 1, thu đủ, in hóa đơn. Phòng 2 vẫn ghi dịch vụ được, phiếu chưa CheckedOut.</li>
+    <li>Buồng phòng nhận và hoàn tất việc dọn phòng 1.</li>
+    <li>Manager void hóa đơn phòng 1, sửa dịch vụ, lập lại hóa đơn.</li>
+    <li>Manager xem báo cáo và sổ thu hôm nay, đối chiếu với các khoản vừa thu.</li>
+  </ol>
+</section>
+</main>
+<footer class="wrap">Nguồn: <code>database/01_HotelManagement_TaoDB.sql</code> (file chuẩn khi tài liệu và DB khác nhau), <code>docs/Tai_lieu_nghiep_vu.md</code>, <code>docs/KE_HOACH_TRIEN_KHAI.md</code>.</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- Tabs ---------------- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+  function selectTab(tab) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+    });
+    try { localStorage.setItem("erd-tab", tab.id); } catch (e) { }
+  }
+  tabs.forEach(function (t) { t.addEventListener("click", function () { selectTab(t); }); });
+  try {
+    var saved = localStorage.getItem("erd-tab");
+    if (saved && document.getElementById(saved)) selectTab(document.getElementById(saved));
+  } catch (e) { }
+
+  /* ---------------- Dữ liệu bảng ----------------
+     cột: [tên, kiểu, cờ]  cờ: PK, FK, PK FK, UQ, CC (cột tính toán) */
+  var W = 250, HEAD = 30, ROW = 18, PAD = 8;
+  var T = {
+    Customers: { x: 20, y: 20, cols: [["CustomerId","int","PK"],["FullName","nvarchar(100)",""],["Gender","nvarchar(10)",""],["DateOfBirth","date",""],["IdNumber","varchar(20)","UQ"],["Phone","varchar(20)",""],["Email","varchar(100)",""],["Address","nvarchar(255)",""],["Nationality","nvarchar(50)",""],["CreatedAt","datetime2",""]] },
+    Bookings: { x: 330, y: 20, cols: [["BookingId","int","PK"],["CustomerId","int","FK"],["DepositRate","tinyint",""],["Status","varchar(20)",""],["Note","nvarchar(500)",""],["CreatedBy","int","FK"],["CreatedAt","datetime2",""],["ConfirmedAt","datetime2",""],["CancelledAt","datetime2",""],["CancelReason","nvarchar(200)",""]] },
+    BookingRooms: { x: 640, y: 20, cols: [["BookingRoomId","int","PK"],["BookingId","int","FK"],["RoomId","int","FK"],["CheckInDate","date",""],["CheckOutDate","date",""],["Nights","int","CC"],["Adults","tinyint",""],["Children","tinyint",""],["PricePerNight","decimal(14,0)",""],["Status","varchar(20)",""],["GuestName","nvarchar(100)",""],["GuestIdNumber","varchar(20)",""],["ActualCheckIn","datetime2",""],["ActualCheckOut","datetime2",""],["CheckInBy","int","FK"],["CheckOutBy","int","FK"],["CancelledAt","datetime2",""],["CancelReason","nvarchar(200)",""],["Note","nvarchar(1000)",""]] },
+    ServiceUsages: { x: 950, y: 20, cols: [["UsageId","int","PK"],["BookingRoomId","int","FK"],["ServiceId","int","FK"],["Quantity","int",""],["UnitPrice","decimal(14,0)",""],["Amount","decimal(14,0)","CC"],["UsedAt","datetime2",""],["Note","nvarchar(200)",""],["CreatedBy","int","FK"],["CreatedAt","datetime2",""]] },
+    Services: { x: 1260, y: 20, cols: [["ServiceId","int","PK"],["ServiceName","nvarchar(100)","UQ"],["Category","nvarchar(50)",""],["Unit","nvarchar(20)",""],["Price","decimal(14,0)",""],["IsActive","bit",""],["IsSystem","bit",""]] },
+    Rooms: { x: 330, y: 300, cols: [["RoomId","int","PK"],["RoomTypeId","int","FK"],["RoomNumber","varchar(10)","UQ"],["Floor","smallint",""],["Status","varchar(20)",""],["Note","nvarchar(200)",""],["IsActive","bit",""]] },
+    RoomTypes: { x: 330, y: 530, cols: [["RoomTypeId","int","PK"],["TypeName","nvarchar(50)","UQ"],["Description","nvarchar(500)",""],["BasePrice","decimal(14,0)",""],["MaxOccupancy","tinyint",""],["BedType","nvarchar(50)",""],["IsActive","bit",""]] },
+    RoomTypeAmenities: { x: 20, y: 560, cols: [["RoomTypeId","int","PK FK"],["AmenityId","int","PK FK"]] },
+    Amenities: { x: 20, y: 700, cols: [["AmenityId","int","PK"],["AmenityName","nvarchar(100)","UQ"],["Description","nvarchar(200)",""]] },
+    HousekeepingTasks: { x: 640, y: 470, cols: [["TaskId","int","PK"],["RoomId","int","FK"],["BookingRoomId","int","FK"],["Source","varchar(20)",""],["Status","varchar(20)",""],["Result","varchar(20)",""],["AssignedTo","int","FK"],["CreatedAt","datetime2",""],["StartedAt","datetime2",""],["CompletedAt","datetime2",""],["Note","nvarchar(500)",""]] },
+    Invoices: { x: 950, y: 300, cols: [["InvoiceId","int","PK"],["InvoiceNo","varchar","CC"],["BookingRoomId","int","FK"],["Nights","smallint",""],["RoomCharge","decimal(14,0)",""],["ServiceCharge","decimal(14,0)",""],["Discount","decimal(14,0)",""],["DiscountReason","nvarchar(200)",""],["TaxRate","decimal(5,2)",""],["TotalAmount","decimal(14,0)","CC"],["BuyerName","nvarchar(150)",""],["BuyerCompanyName","nvarchar(200)",""],["BuyerTaxCode","varchar(20)",""],["BuyerAddress","nvarchar(255)",""],["Status","varchar(10)",""],["IssuedAt","datetime2",""],["IssuedBy","int","FK"],["VoidedAt","datetime2",""],["VoidedBy","int","FK"],["VoidReason","nvarchar(200)",""],["ReplacesInvoiceId","int","FK"]] },
+    Payments: { x: 1260, y: 300, cols: [["PaymentId","int","PK"],["BookingRoomId","int","FK"],["InvoiceId","int","FK"],["Type","varchar(10)",""],["Amount","decimal(14,0)",""],["SignedAmount","decimal(14,0)","CC"],["Method","varchar(20)",""],["ReferenceNo","varchar(50)",""],["PaidAt","datetime2",""],["EmployeeId","int","FK"],["Note","nvarchar(200)",""]] },
+    Employees: { x: 1260, y: 620, cols: [["EmployeeId","int","PK"],["RoleId","int","FK"],["FullName","nvarchar(100)",""],["Username","varchar(50)","UQ"],["PasswordHash","varchar(255)",""],["Phone","varchar(20)",""],["Email","varchar(100)",""],["HireDate","date",""],["IsActive","bit",""],["CreatedAt","datetime2",""]] },
+    Roles: { x: 950, y: 770, cols: [["RoleId","int","PK"],["RoleName","nvarchar(50)","UQ"],["Description","nvarchar(200)",""]] }
+  };
+
+  /* ---------------- Quan hệ ----------------
+     child.col (FK) → parent.col (PK). pc = phía cha ('1' bắt buộc | '01' FK cho phép NULL),
+     cc = phía con ('n' | '01' khi nghiệp vụ giới hạn một-một).
+     route: {e: x} = đường gấp khúc 1 lần tại x;  {b: [x1, y, x2]} = đi ra x1, sang y, tới x2.
+     cs/ps = cạnh bảng nối ('L' | 'R'); pdy = lệch dọc ở đầu cha để các đường không chồng nhau.
+     ps = 'B': nối vào cạnh dưới bảng cha tại x = cha.x + px; route {b: [x1, y]} = đi ra x1, xuống làn y, sang rồi lên. */
+  var R = [
+    { c:"Employees", cc_:"RoleId", p:"Roles", pk:"RoleId", pc:"1", cc:"n", cs:"L", ps:"R", route:{e:1230}, kind:"1-n", note:"Mỗi nhân viên thuộc đúng 1 vai trò; 4 vai trò cố định" },
+    { c:"Bookings", cc_:"CustomerId", p:"Customers", pk:"CustomerId", pc:"1", cc:"n", cs:"L", ps:"R", route:{e:300}, kind:"1-n", note:"Một khách đặt nhiều phiếu; không xóa khách đã có phiếu" },
+    { c:"BookingRooms", cc_:"BookingId", p:"Bookings", pk:"BookingId", pc:"1", cc:"n", cs:"L", ps:"R", route:{e:605}, kind:"1-n", note:"Một phiếu gồm 1..n lượt lưu trú (mỗi phòng một lượt)" },
+    { c:"BookingRooms", cc_:"RoomId", p:"Rooms", pk:"RoomId", pc:"1", cc:"n", cs:"L", ps:"R", route:{e:620}, pdy:-4, kind:"1-n", note:"Một phòng có nhiều lượt ở các khoảng ngày không trùng nhau" },
+    { c:"Rooms", cc_:"RoomTypeId", p:"RoomTypes", pk:"RoomTypeId", pc:"1", cc:"n", cs:"L", ps:"L", route:{e:310}, pdy:-4, kind:"1-n", note:"Mỗi phòng thuộc 1 loại; giá phòng lấy từ loại lúc đặt" },
+    { c:"RoomTypeAmenities", cc_:"RoomTypeId", p:"RoomTypes", pk:"RoomTypeId", pc:"1", cc:"n", cs:"R", ps:"L", route:{e:295}, pdy:4, kind:"n-n", note:"Nửa thứ nhất của quan hệ n–n RoomTypes ⟷ Amenities" },
+    { c:"RoomTypeAmenities", cc_:"AmenityId", p:"Amenities", pk:"AmenityId", pc:"1", cc:"n", cs:"L", ps:"L", route:{e:8}, kind:"n-n", note:"Nửa thứ hai của quan hệ n–n; không xóa tiện nghi đang được gán" },
+    { c:"ServiceUsages", cc_:"BookingRoomId", p:"BookingRooms", pk:"BookingRoomId", pc:"1", cc:"n", cs:"L", ps:"R", route:{e:915}, pdy:-6, kind:"1-n", note:"Dịch vụ ghi theo từng lượt lưu trú (từng phòng)" },
+    { c:"ServiceUsages", cc_:"ServiceId", p:"Services", pk:"ServiceId", pc:"1", cc:"n", cs:"R", ps:"L", route:{e:1230}, kind:"1-n", note:"Đơn giá lưu tại thời điểm dùng nên đổi giá dịch vụ không ảnh hưởng dòng cũ" },
+    { c:"Invoices", cc_:"BookingRoomId", p:"BookingRooms", pk:"BookingRoomId", pc:"1", cc:"n", cs:"L", ps:"R", route:{e:925}, pdy:-2, kind:"1-n*", note:"Vật lý 1–n (gồm hóa đơn void). Index lọc UX_Invoices_ActivePerStay: mỗi lượt tối đa 1 hóa đơn Paid → 1 – 0..1 hiệu lực" },
+    { c:"Payments", cc_:"BookingRoomId", p:"BookingRooms", pk:"BookingRoomId", pc:"1", cc:"n", cs:"L", ps:"R", route:{b:[1240,268,935]}, pdy:2, kind:"1-n", note:"Mọi khoản cọc / thanh toán / hoàn gắn với một lượt lưu trú" },
+    { c:"Payments", cc_:"InvoiceId", p:"Invoices", pk:"InvoiceId", pc:"01", cc:"n", cs:"L", ps:"R", route:{e:1232}, pdy:-4, kind:"0..1-n", note:"Khoản tiền được gắn vào hóa đơn khi lập hóa đơn; trước đó NULL" },
+    { c:"Invoices", cc_:"ReplacesInvoiceId", p:"Invoices", pk:"InvoiceId", pc:"01", cc:"01", cs:"R", ps:"R", route:{e:1218}, pdy:4, kind:"1-1", note:"Tự tham chiếu: hóa đơn lập lại thay cho đúng 1 hóa đơn đã void (1 – 0..1)" },
+    { c:"HousekeepingTasks", cc_:"RoomId", p:"Rooms", pk:"RoomId", pc:"1", cc:"n", cs:"L", ps:"R", route:{e:612}, pdy:4, kind:"1-n*", note:"Một phòng nhiều việc dọn theo thời gian; index lọc UX_HousekeepingTasks_OpenTask: tối đa 1 việc đang mở" },
+    { c:"HousekeepingTasks", cc_:"BookingRoomId", p:"BookingRooms", pk:"BookingRoomId", pc:"01", cc:"01", cs:"R", ps:"R", route:{e:905}, pdy:6, kind:"1-1", note:"Mỗi lần check-out sinh 1 việc dọn (1 – 0..1); việc sau bảo trì không gắn lượt nào (NULL)" },
+    /* ---- nhân viên thực hiện (nét đứt) ---- */
+    { c:"Bookings", cc_:"CreatedBy", p:"Employees", pk:"EmployeeId", pc:"1", cc:"n", cs:"L", ps:"B", px:200, route:{b:[318,906]}, audit:true, kind:"1-n", note:"Nhân viên tạo phiếu" },
+    { c:"BookingRooms", cc_:"CheckInBy", p:"Employees", pk:"EmployeeId", pc:"01", cc:"n", cs:"R", ps:"B", px:160, route:{b:[895,896]}, audit:true, kind:"0..1-n", note:"Nhân viên check-in (NULL khi chưa nhận)" },
+    { c:"BookingRooms", cc_:"CheckOutBy", p:"Employees", pk:"EmployeeId", pc:"01", cc:"n", cs:"R", ps:"B", px:120, route:{b:[899,886]}, audit:true, kind:"0..1-n", note:"Nhân viên check-out (NULL khi chưa trả)" },
+    { c:"ServiceUsages", cc_:"CreatedBy", p:"Employees", pk:"EmployeeId", pc:"1", cc:"n", cs:"R", ps:"B", px:40, route:{b:[1210,866]}, audit:true, kind:"1-n", note:"Nhân viên ghi dịch vụ" },
+    { c:"Invoices", cc_:"IssuedBy", p:"Employees", pk:"EmployeeId", pc:"1", cc:"n", cs:"R", ps:"L", route:{e:1226}, pdy:-4, audit:true, kind:"1-n", note:"Nhân viên lập hóa đơn" },
+    { c:"Invoices", cc_:"VoidedBy", p:"Employees", pk:"EmployeeId", pc:"01", cc:"n", cs:"R", ps:"L", route:{e:1236}, pdy:4, audit:true, kind:"0..1-n", note:"Nhân viên void hóa đơn (NULL khi còn hiệu lực)" },
+    { c:"Payments", cc_:"EmployeeId", p:"Employees", pk:"EmployeeId", pc:"1", cc:"n", cs:"R", ps:"R", route:{e:1526}, audit:true, kind:"1-n", note:"Nhân viên thu / hoàn tiền" },
+    { c:"HousekeepingTasks", cc_:"AssignedTo", p:"Employees", pk:"EmployeeId", pc:"01", cc:"n", cs:"R", ps:"B", px:80, route:{b:[903,876]}, audit:true, kind:"0..1-n", note:"Nhân viên buồng phòng nhận việc (NULL khi chưa ai nhận)" }
+  ];
+
+  /* ---------------- Vẽ SVG ---------------- */
+  var NS = "http://www.w3.org/2000/svg";
+  var svg = document.getElementById("erd");
+  var VW = 1545, VH = 920;
+  svg.setAttribute("viewBox", "0 0 " + VW + " " + VH);
+  svg.classList.add("audit-off");
+
+  function el(name, attrs, parent) {
+    var e = document.createElementNS(NS, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function h(t) { return HEAD + T[t].cols.length * ROW + PAD; }
+  function colIndex(t, c) {
+    for (var i = 0; i < T[t].cols.length; i++) if (T[t].cols[i][0] === c) return i;
+    throw new Error("Không có cột " + t + "." + c);
+  }
+  function rowY(t, c) { return T[t].y + HEAD + colIndex(t, c) * ROW + ROW / 2 + 2; }
+
+  var edgeLayer = el("g", {}, svg);
+  var tableLayer = el("g", {}, svg);
+
+  /* Bảng */
+  Object.keys(T).forEach(function (name) {
+    var t = T[name], g = el("g", { "class": "tbl", "data-t": name }, tableLayer);
+    var H = h(name);
+    el("rect", { "class": "t-box", x: t.x, y: t.y, width: W, height: H, rx: 6 }, g);
+    var head = el("path", { "class": "t-head", d: "M" + (t.x) + "," + (t.y + HEAD) + " V" + (t.y + 6) + " q0,-6 6,-6 H" + (t.x + W - 6) + " q6,0 6,6 V" + (t.y + HEAD) + " Z" }, g);
+    var title = el("text", { "class": "t-title", x: t.x + 10, y: t.y + 20 }, g);
+    title.textContent = name;
+    t.cols.forEach(function (c, i) {
+      var y = t.y + HEAD + i * ROW;
+      if (c[2].indexOf("PK") >= 0 || c[2].indexOf("FK") >= 0) {
+        el("rect", { "class": "t-rowhl", x: t.x + 1, y: y + 2, width: W - 2, height: ROW, opacity: c[2].indexOf("PK") >= 0 ? 0.9 : 0.45 }, g);
+      }
+      var badge = c[2].split(" ");
+      var bx = t.x + 8;
+      badge.forEach(function (b) {
+        if (!b) return;
+        var bt = el("text", { "class": "t-badge " + ({ PK: "b-pk", FK: "b-fk", UQ: "b-uq", CC: "b-cc" })[b], x: bx, y: y + 15 }, g);
+        bt.textContent = b;
+        bx += 18;
+      });
+      var tx = el("text", { "class": "t-col", x: t.x + 46, y: y + 15 }, g);
+      tx.textContent = c[0];
+      if (c[2].indexOf("PK") >= 0) tx.setAttribute("font-weight", "700");
+      var ty = el("text", { "class": "t-type", x: t.x + W - 8, y: y + 15, "text-anchor": "end" }, g);
+      ty.textContent = c[1];
+    });
+    var tip = el("title", {}, g);
+    tip.textContent = name + " (" + t.cols.length + " cột)";
+  });
+
+  /* Ký hiệu đầu đường. d = +1 nếu đường đi sang phải (hoặc xuống, khi vert) từ điểm nối, -1 nếu sang trái (hoặc lên).
+     Vẽ theo trục (u = dọc đường, v = ngang đường) rồi đổi sang x/y. */
+  function marker(g, x, y, d, kind, vert) {
+    function P(u, v) { return vert ? [x + v, y + u] : [x + u, y + v]; }
+    function ln(u1, v1, u2, v2) { var a = P(u1, v1), b = P(u2, v2); el("line", { "class": "mk", x1: a[0], y1: a[1], x2: b[0], y2: b[1] }, g); }
+    function dot(u) { var c = P(u, 0); el("circle", { "class": "mkdot", cx: c[0], cy: c[1], r: 3.5 }, g); }
+    if (kind === "n") {            /* 0..n: chân quạ + vòng tròn */
+      ln(d * 13, 0, 0, -6); ln(d * 13, 0, 0, 6);
+      dot(d * 18);
+    } else if (kind === "1") {     /* đúng 1: hai vạch */
+      ln(d * 7, -6, d * 7, 6); ln(d * 11, -6, d * 11, 6);
+    } else {                       /* 0..1: vạch + vòng tròn */
+      ln(d * 7, -6, d * 7, 6); dot(d * 14);
+    }
+  }
+
+  R.forEach(function (r, i) {
+    var ct = T[r.c], pt = T[r.p];
+    var sx = r.cs === "R" ? ct.x + W : ct.x, sy = rowY(r.c, r.cc_);
+    var bottom = r.ps === "B";
+    var ex = bottom ? pt.x + r.px : r.ps === "R" ? pt.x + W : pt.x;
+    var ey = bottom ? pt.y + h(r.p) : rowY(r.p, r.pk) + (r.pdy || 0);
+    var pts = [[sx, sy]];
+    if (r.route.e !== undefined) { pts.push([r.route.e, sy]); pts.push([r.route.e, ey]); }
+    else if (bottom) { var lb = r.route.b; pts.push([lb[0], sy]); pts.push([lb[0], lb[1]]); pts.push([ex, lb[1]]); }
+    else { var b = r.route.b; pts.push([b[0], sy]); pts.push([b[0], b[1]]); pts.push([b[2], b[1]]); pts.push([b[2], ey]); }
+    pts.push([ex, ey]);
+    var d = pts.map(function (p, k) { return (k ? "L" : "M") + p[0] + "," + p[1]; }).join(" ");
+    var g = el("g", { "class": "edge" + (r.audit ? " audit" : ""), "data-a": r.c, "data-b": r.p }, edgeLayer);
+    el("path", { "class": "hit", d: d }, g);
+    el("path", { "class": "ln", d: d }, g);
+    marker(g, sx, sy, pts[1][0] > sx ? 1 : -1, r.cc);
+    if (bottom) marker(g, ex, ey, 1, r.pc, true);
+    else marker(g, ex, ey, pts[pts.length - 2][0] > ex ? 1 : -1, r.pc);
+    var tip = el("title", {}, g);
+    tip.textContent = r.c + "." + r.cc_ + " → " + r.p + "." + r.pk + "  (" + label(r) + ")\n" + r.note;
+  });
+
+  function label(r) {
+    if (r.kind === "n-n") return "thành phần của quan hệ n – n";
+    if (r.kind === "1-1") return "1 – 0..1";
+    if (r.kind === "0..1-n") return "0..1 – n";
+    if (r.kind === "1-n*") return "1 – n (giới hạn bằng index lọc)";
+    return "1 – n";
+  }
+
+  /* Làm nổi quan hệ khi rê chuột vào bảng */
+  Array.prototype.forEach.call(svg.querySelectorAll(".tbl"), function (g) {
+    g.addEventListener("mouseenter", function () {
+      var name = g.getAttribute("data-t"), related = {};
+      related[name] = true;
+      svg.classList.add("focus");
+      Array.prototype.forEach.call(svg.querySelectorAll(".edge"), function (e) {
+        var hit = e.getAttribute("data-a") === name || e.getAttribute("data-b") === name;
+        if (hit && svg.classList.contains("audit-off") && e.classList.contains("audit")) hit = false;
+        e.classList.toggle("hl", hit);
+        if (hit) { related[e.getAttribute("data-a")] = true; related[e.getAttribute("data-b")] = true; }
+      });
+      Array.prototype.forEach.call(svg.querySelectorAll(".tbl"), function (t) {
+        t.classList.toggle("hl", !!related[t.getAttribute("data-t")]);
+      });
+    });
+    g.addEventListener("mouseleave", function () { svg.classList.remove("focus"); });
+  });
+
+  /* Bật/tắt quan hệ nhân viên */
+  var chk = document.getElementById("chkAudit");
+  chk.addEventListener("change", function () { svg.classList.toggle("audit-off", !chk.checked); });
+
+  /* Thu phóng */
+  var zoom = 1, box = document.getElementById("erdBox");
+  function applyZoom() { svg.style.width = Math.round(VW * zoom) + "px"; svg.style.height = Math.round(VH * zoom) + "px"; }
+  function fit() { zoom = Math.max(0.35, Math.min(1, (box.clientWidth - 4) / VW)); applyZoom(); }
+  document.getElementById("zoomIn").addEventListener("click", function () { zoom = Math.min(2, zoom + 0.15); applyZoom(); });
+  document.getElementById("zoomOut").addEventListener("click", function () { zoom = Math.max(0.35, zoom - 0.15); applyZoom(); });
+  document.getElementById("zoomFit").addEventListener("click", fit);
+  fit();
+
+  /* Bảng liệt kê quan hệ */
+  var tbody = document.querySelector("#relTable tbody");
+  R.forEach(function (r, i) {
+    var tr = document.createElement("tr");
+    var cls = r.kind === "1-1" ? "one" : r.kind === "n-n" ? "nn" : r.audit ? "a" : "n";
+    var cells = [
+      i + 1,
+      "<b>" + r.p + "</b>." + r.pk,
+      "<b>" + r.c + "</b>." + r.cc_,
+      "<code>" + r.c + "." + r.cc_ + " → " + r.p + "." + r.pk + "</code>",
+      '<span class="pill ' + cls + '">' + label(r) + "</span>",
+      r.pc === "1" ? "NOT NULL" : "cho phép NULL",
+      r.note + (r.audit ? " <span class='muted'>(nhân viên thực hiện)</span>" : "")
+    ];
+    tr.innerHTML = cells.map(function (c) { return "<td>" + c + "</td>"; }).join("");
+    tbody.appendChild(tr);
+  });
+
+  /* Tìm trong tab 2 */
+  var search = document.getElementById("objSearch"), count = document.getElementById("objCount");
+  var objRows = Array.prototype.slice.call(document.querySelectorAll("table.obj tbody tr"));
+  function norm(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d"); }
+  objRows.forEach(function (tr) { tr.dataset.k = norm(tr.textContent); });
+  function filter() {
+    var q = norm(search.value.trim()), shown = 0;
+    objRows.forEach(function (tr) { var ok = !q || tr.dataset.k.indexOf(q) >= 0; tr.hidden = !ok; if (ok) shown++; });
+    count.textContent = shown + " / " + objRows.length + " đối tượng";
+  }
+  search.addEventListener("input", filter);
+  filter();
+})();
+</script>
+</body>
+</html>

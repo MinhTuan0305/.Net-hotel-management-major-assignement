@@ -77,10 +77,19 @@ ORDER BY s.CheckOutDate, s.RoomNumber;";
             UiHelper.ColorRows(dgvArrivals, "BookingStatus", ColorByBookingStatus);
             // Gắn SAU ColorRows để màu ô "Tình trạng phòng" không bị màu cả dòng đè lên.
             dgvArrivals.CellFormatting += dgvArrivals_CellFormatting;
+            UiHelper.AddColorLegend(dgvArrivals,
+                (Color.Empty, "Phiếu đã đủ cọc"),
+                (PendingColor, "Cả dòng: phiếu chưa đủ cọc"),
+                (RoomStatus.ToColor(RoomStatus.Occupied), "Ô Tình trạng phòng: khách cũ chưa trả"),
+                (RoomStatus.ToColor(RoomStatus.Cleaning), "Ô Tình trạng phòng: đang dọn"),
+                (RoomStatus.ToColor(RoomStatus.Maintenance), "Ô Tình trạng phòng: bảo trì"));
 
             // Tab Dự kiến trả: hiện số phút trễ dạng "1 giờ 30 phút" và tô đỏ dòng đã quá 12:00.
             UiHelper.TranslateColumn(dgvDepartures, "LateMinutes", FormatLate);
             UiHelper.ColorRows(dgvDepartures, "LateMinutes", ColorByLate);
+            UiHelper.AddColorLegend(dgvDepartures,
+                (Color.Empty, "Chưa quá 12:00"),
+                (LateColor, "Đã quá 12:00 (trả trễ)"));
         }
 
         private void frmFrontDesk_Load(object sender, EventArgs e)

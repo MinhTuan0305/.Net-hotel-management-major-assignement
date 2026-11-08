@@ -25,6 +25,7 @@ Code viết cho .NET Framework 4.8 / C# 7.3.
 | `UiHelper.IsValidEmail / IsValidPhone / IsValidIdNumber` | Kiểm tra định dạng email, SĐT (8–15 số), CCCD/hộ chiếu (6–20 chữ/số); chuỗi rỗng coi là hợp lệ |
 | `DbHelper.LikeContains(text)` | Chuỗi tìm kiếm cho LIKE: thoát `[ % _` rồi bọc `%...%`; ô trống trả `null` |
 | `DbHelper.ScalarTx<T>(conn, tx, sql, ...)` | Lấy một giá trị bên trong `InTransaction` (vd. id vừa INSERT) |
+| `UiHelper.AddColorLegend(dgv, (màu, "chữ"), ...)` | (thêm 07/11) Khung "Chú thích màu" sát bên phải lưới Dock = Fill; `Color.Empty` = dòng không tô |
 
 Ngoài thư mục Core còn có 4 file ở gốc project:
 

@@ -340,9 +340,9 @@
             this.lblLegend.ForeColor = System.Drawing.SystemColors.GrayText;
             this.lblLegend.Location = new System.Drawing.Point(140, 11);
             this.lblLegend.Name = "lblLegend";
-            this.lblLegend.Size = new System.Drawing.Size(470, 15);
+            this.lblLegend.Size = new System.Drawing.Size(390, 15);
             this.lblLegend.TabIndex = 1;
-            this.lblLegend.Text = "Xanh: trống   ·   Đỏ: có khách   ·   Vàng: đang dọn   ·   Xám: bảo trì   ·   Nhấp đúp để thao tác";
+            this.lblLegend.Text = "Nhấp đúp vào ô phòng để thao tác (ghi dịch vụ, nhận phòng, dọn phòng)";
             //
             // btnRefresh
             //

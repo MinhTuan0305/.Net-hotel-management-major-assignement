@@ -56,6 +56,10 @@ ORDER BY CASE x.Status WHEN 'InProgress' THEN 0 WHEN 'Pending' THEN 1 ELSE 2 END
             UiHelper.TranslateColumn(dgvTasks, "RoomStatus", RoomStatus.ToVietnamese);
             UiHelper.TranslateColumn(dgvTasks, "WaitingMinutes", FormatWaiting);
             UiHelper.ColorRows(dgvTasks, "Status", ColorByStatus);
+            UiHelper.AddColorLegend(dgvTasks,
+                (PendingColor, HousekeepingStatus.ToVietnamese(HousekeepingStatus.Pending)),
+                (InProgressColor, HousekeepingStatus.ToVietnamese(HousekeepingStatus.InProgress)),
+                (DoneColor, HousekeepingStatus.ToVietnamese(HousekeepingStatus.Done)));
         }
 
         private void frmHousekeeping_Load(object sender, EventArgs e)

@@ -40,6 +40,10 @@ ORDER BY PaidAt DESC, PaymentId DESC;";
             UiHelper.TranslateColumn(dgvLedger, "Method", PayMethod.ToVietnamese);
             UiHelper.ColorRows(dgvLedger, "Type", t =>
                 t == PaymentType.Refund ? RefundColor : t == PaymentType.Deposit ? DepositColor : Color.Empty);
+            UiHelper.AddColorLegend(dgvLedger,
+                (DepositColor, PaymentType.ToVietnamese(PaymentType.Deposit)),
+                (Color.Empty, PaymentType.ToVietnamese(PaymentType.Payment)),
+                (RefundColor, PaymentType.ToVietnamese(PaymentType.Refund)));
         }
 
         private void frmPaymentLedger_Load(object sender, EventArgs e)

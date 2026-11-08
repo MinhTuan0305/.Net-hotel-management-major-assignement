@@ -6,7 +6,8 @@
 //     1. Lưới DataGridView: StyleGrid (kiểu chung), Bind (gán dữ liệu + tự định
 //        dạng cột tiền/ngày + giữ dòng đang chọn), ShowColumns (chỉ hiện cột cần
 //        thiết và đặt tiêu đề tiếng Việt), TranslateColumn (đổi "CheckedIn" ->
-//        "Đang ở"), ColorRows (tô màu theo trạng thái), SelectedRow / SelectedId.
+//        "Đang ở"), ColorRows (tô màu theo trạng thái), AddColorLegend (khung chú
+//        thích màu bên phải lưới), SelectedRow / SelectedId.
 //     2. Hộp thông báo: Info, Warn, Error, Confirm.
 //     3. Kiểm tra nhập liệu: RequireText, RequireSelection, RequireSelectedRow.
 //     4. Phân quyền giao diện: VisibleFor / EnabledFor (control và mục menu).
@@ -198,6 +199,66 @@ namespace HotelManagement.Core
                 Color c = colorOf(v.ToString());
                 if (c != Color.Empty) e.CellStyle.BackColor = c;
             };
+        }
+
+        /// <summary>
+        /// Thêm khung "Chú thích màu" sát bên phải lưới, giải thích các màu ColorRows đang tô.
+        /// Lưới phải Dock = Fill. Gọi MỘT lần sau InitializeComponent. Color.Empty = dòng không tô màu.
+        ///   UiHelper.AddColorLegend(dgvTasks,
+        ///       (PendingColor, "Chờ dọn"),
+        ///       (DoneColor, "Hoàn tất"));
+        /// </summary>
+        public static FlowLayoutPanel AddColorLegend(DataGridView dgv, params (Color Color, string Text)[] items)
+        {
+            Control parent = dgv.Parent;
+            var pnl = new FlowLayoutPanel
+            {
+                Name = "pnlLegend" + dgv.Name,
+                Dock = DockStyle.Right,
+                Width = 175,
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false,
+                AutoScroll = true,
+                Padding = new Padding(8, 6, 4, 4)
+            };
+            pnl.Controls.Add(new Label
+            {
+                Text = "Chú thích màu",
+                AutoSize = true,
+                Font = new Font(dgv.Font, FontStyle.Bold),
+                Margin = new Padding(0, 0, 0, 6)
+            });
+            foreach (var item in items)
+            {
+                var row = new FlowLayoutPanel
+                {
+                    AutoSize = true,
+                    FlowDirection = FlowDirection.LeftToRight,
+                    WrapContents = false,
+                    Margin = new Padding(0, 0, 0, 4)
+                };
+                row.Controls.Add(new Panel
+                {
+                    Size = new Size(16, 16),
+                    BackColor = item.Color == Color.Empty ? dgv.DefaultCellStyle.BackColor : item.Color,
+                    BorderStyle = BorderStyle.FixedSingle,
+                    Margin = new Padding(0, 1, 6, 0)
+                });
+                row.Controls.Add(new Label
+                {
+                    Text = item.Text,
+                    AutoSize = true,
+                    MaximumSize = new Size(135, 0),   // chữ dài thì xuống dòng, không tràn khung
+                    Margin = new Padding(0, 1, 0, 0)
+                });
+                pnl.Controls.Add(row);
+            }
+
+            // Đặt ngay sau lưới trong thứ tự Dock để khung nằm sát lưới
+            // (nằm giữa lưới và panel Dock = Right có sẵn, nếu form có).
+            parent.Controls.Add(pnl);
+            parent.Controls.SetChildIndex(pnl, parent.Controls.GetChildIndex(dgv) + 1);
+            return pnl;
         }
 
         /// <summary>DataRow của dòng đang chọn; null nếu chưa chọn.</summary>

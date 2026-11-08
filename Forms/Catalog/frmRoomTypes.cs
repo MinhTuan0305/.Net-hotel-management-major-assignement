@@ -36,6 +36,9 @@ ORDER BY rt.BasePrice, rt.TypeName;";
             UiHelper.StyleGrid(dgvRoomTypes);
             UiHelper.SetupMoneyInput(nudBasePrice);
             UiHelper.ColorRows(dgvRoomTypes, "IsActive", v => v == "False" ? SystemColors.ControlLight : Color.Empty);
+            UiHelper.AddColorLegend(dgvRoomTypes,
+                (Color.Empty, "Đang sử dụng"),
+                (SystemColors.ControlLight, "Ngừng sử dụng"));
         }
 
         private void frmRoomTypes_Load(object sender, EventArgs e)

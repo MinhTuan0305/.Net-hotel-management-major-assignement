@@ -48,6 +48,9 @@ WHERE r.RoleName = 'Admin' AND e.IsActive = 1 AND e.EmployeeId <> @Id;";
             UiHelper.TranslateColumn(dgvEmployees, "RoleName", Roles.ToVietnamese);
             UiHelper.TranslateColumn(dgvRoles, "RoleName", r => Roles.ToVietnamese(r) + " (" + r + ")");
             UiHelper.ColorRows(dgvEmployees, "IsActive", v => v == "False" ? SystemColors.ControlLight : Color.Empty);
+            UiHelper.AddColorLegend(dgvEmployees,
+                (Color.Empty, "Đang hoạt động"),
+                (SystemColors.ControlLight, "Tài khoản bị khóa"));
         }
 
         private void frmEmployees_Load(object sender, EventArgs e)

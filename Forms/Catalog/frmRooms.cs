@@ -40,6 +40,11 @@ ORDER BY r.Floor, r.RoomNumber;";
             UiHelper.StyleGrid(dgvRooms);
             UiHelper.TranslateColumn(dgvRooms, "Status", RoomStatus.ToVietnamese);
             UiHelper.ColorRows(dgvRooms, "Status", RoomStatus.ToColor);
+            UiHelper.AddColorLegend(dgvRooms,
+                (RoomStatus.ToColor(RoomStatus.Available), RoomStatus.ToVietnamese(RoomStatus.Available)),
+                (RoomStatus.ToColor(RoomStatus.Occupied), RoomStatus.ToVietnamese(RoomStatus.Occupied)),
+                (RoomStatus.ToColor(RoomStatus.Cleaning), RoomStatus.ToVietnamese(RoomStatus.Cleaning)),
+                (RoomStatus.ToColor(RoomStatus.Maintenance), RoomStatus.ToVietnamese(RoomStatus.Maintenance)));
         }
 
         private void frmRooms_Load(object sender, EventArgs e)
